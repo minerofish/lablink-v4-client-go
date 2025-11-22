@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"os"
 
-	lablink "github.com/stainless-sdks/lablink-v4-client-go"
-	"github.com/stainless-sdks/lablink-v4-client-go/option"
+	lablink "github.com/minerofish/lablink-v4-client-go"
+	"github.com/minerofish/lablink-v4-client-go/option"
 )
 
 func main() {

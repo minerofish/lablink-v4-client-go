@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/stainless-sdks/lablink-v4-client-go/option"
+	"github.com/minerofish/lablink-v4-client-go/option"
 )
 
 type AuthenticatedClient interface {
