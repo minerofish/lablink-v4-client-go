@@ -26,6 +26,7 @@ func TestLaboratoryNew(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Laboratories.New(context.TODO(), lablinkv4client.LaboratoryNewParams{
@@ -60,6 +61,7 @@ func TestLaboratoryListWithOptionalParams(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Laboratories.List(context.TODO(), lablinkv4client.LaboratoryListParams{
@@ -85,6 +87,7 @@ func TestLaboratoryDelete(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
 	err := client.Laboratories.Delete(context.TODO(), lablinkv4client.LaboratoryDeleteParams{
@@ -110,6 +113,7 @@ func TestLaboratoryQueryWithOptionalParams(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Laboratories.Query(context.TODO(), lablinkv4client.LaboratoryQueryParams{
@@ -139,6 +143,7 @@ func TestLaboratoryUploadConfirmatoryResults(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Laboratories.UploadConfirmatoryResults(
@@ -176,6 +181,7 @@ func TestLaboratoryUploadDocument(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
 	err := client.Laboratories.UploadDocument(
@@ -207,6 +213,7 @@ func TestLaboratoryUploadResults(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Laboratories.UploadResults(
