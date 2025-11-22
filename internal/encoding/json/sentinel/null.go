@@ -1,7 +1,7 @@
 package sentinel
 
 import (
-	"github.com/stainless-sdks/lablink-v4-client-go/internal/encoding/json/shims"
+	"github.com/minerofish/lablink-v4-client-go/internal/encoding/json/shims"
 	"reflect"
 	"sync"
 )

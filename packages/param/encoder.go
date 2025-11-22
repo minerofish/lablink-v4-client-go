@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	shimjson "github.com/stainless-sdks/lablink-v4-client-go/internal/encoding/json"
+	shimjson "github.com/minerofish/lablink-v4-client-go/internal/encoding/json"
 
 	"github.com/tidwall/sjson"
 )

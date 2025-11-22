@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stainless-sdks/lablink-v4-client-go"
-	"github.com/stainless-sdks/lablink-v4-client-go/internal"
-	"github.com/stainless-sdks/lablink-v4-client-go/option"
+	"github.com/minerofish/lablink-v4-client-go"
+	"github.com/minerofish/lablink-v4-client-go/internal"
+	"github.com/minerofish/lablink-v4-client-go/option"
 )
 
 type closureTransport struct {

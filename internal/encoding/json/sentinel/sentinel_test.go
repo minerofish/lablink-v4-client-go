@@ -1,8 +1,8 @@
 package sentinel_test
 
 import (
-	"github.com/stainless-sdks/lablink-v4-client-go/internal/encoding/json/sentinel"
-	"github.com/stainless-sdks/lablink-v4-client-go/packages/param"
+	"github.com/minerofish/lablink-v4-client-go/internal/encoding/json/sentinel"
+	"github.com/minerofish/lablink-v4-client-go/packages/param"
 	"reflect"
 	"slices"
 	"testing"
