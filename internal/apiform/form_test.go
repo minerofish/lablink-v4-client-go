@@ -2,7 +2,7 @@ package apiform
 
 import (
 	"bytes"
-	"github.com/stainless-sdks/lablink-v4-client-go/packages/param"
+	"github.com/minerofish/lablink-v4-client-go/packages/param"
 	"io"
 	"mime/multipart"
 	"strings"

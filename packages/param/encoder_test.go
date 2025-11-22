@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stainless-sdks/lablink-v4-client-go/packages/param"
+	"github.com/minerofish/lablink-v4-client-go/packages/param"
 )
 
 type Struct struct {

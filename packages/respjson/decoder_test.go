@@ -3,8 +3,8 @@ package respjson_test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stainless-sdks/lablink-v4-client-go/internal/apijson"
-	rj "github.com/stainless-sdks/lablink-v4-client-go/packages/respjson"
+	"github.com/minerofish/lablink-v4-client-go/internal/apijson"
+	rj "github.com/minerofish/lablink-v4-client-go/packages/respjson"
 	"reflect"
 	"testing"
 )

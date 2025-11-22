@@ -18,10 +18,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/stainless-sdks/lablink-v4-client-go/internal"
-	"github.com/stainless-sdks/lablink-v4-client-go/internal/apierror"
-	"github.com/stainless-sdks/lablink-v4-client-go/internal/apiform"
-	"github.com/stainless-sdks/lablink-v4-client-go/internal/apiquery"
+	"github.com/minerofish/lablink-v4-client-go/internal"
+	"github.com/minerofish/lablink-v4-client-go/internal/apierror"
+	"github.com/minerofish/lablink-v4-client-go/internal/apiform"
+	"github.com/minerofish/lablink-v4-client-go/internal/apiquery"
 )
 
 func getDefaultHeaders() map[string]string {

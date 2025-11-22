@@ -3,8 +3,8 @@ package apijson_test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stainless-sdks/lablink-v4-client-go/internal/apijson"
-	"github.com/stainless-sdks/lablink-v4-client-go/packages/param"
+	"github.com/minerofish/lablink-v4-client-go/internal/apijson"
+	"github.com/minerofish/lablink-v4-client-go/packages/param"
 	"reflect"
 	"testing"
 )
