@@ -8,8 +8,8 @@ import (
 	"os"
 	"slices"
 
-	"github.com/stainless-sdks/lablink-v4-client-go/internal/requestconfig"
-	"github.com/stainless-sdks/lablink-v4-client-go/option"
+	"github.com/minerofish/lablink-v4-client-go/internal/requestconfig"
+	"github.com/minerofish/lablink-v4-client-go/option"
 )
 
 // Client creates a struct with services and top level methods that help with

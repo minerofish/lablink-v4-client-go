@@ -9,12 +9,12 @@ import (
 	"slices"
 	"time"
 
-	"github.com/stainless-sdks/lablink-v4-client-go/internal/apijson"
-	shimjson "github.com/stainless-sdks/lablink-v4-client-go/internal/encoding/json"
-	"github.com/stainless-sdks/lablink-v4-client-go/internal/requestconfig"
-	"github.com/stainless-sdks/lablink-v4-client-go/option"
-	"github.com/stainless-sdks/lablink-v4-client-go/packages/param"
-	"github.com/stainless-sdks/lablink-v4-client-go/packages/respjson"
+	"github.com/minerofish/lablink-v4-client-go/internal/apijson"
+	shimjson "github.com/minerofish/lablink-v4-client-go/internal/encoding/json"
+	"github.com/minerofish/lablink-v4-client-go/internal/requestconfig"
+	"github.com/minerofish/lablink-v4-client-go/option"
+	"github.com/minerofish/lablink-v4-client-go/packages/param"
+	"github.com/minerofish/lablink-v4-client-go/packages/respjson"
 )
 
 // BloodlabOrderService contains methods and other services that help with

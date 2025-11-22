@@ -1,4 +1,4 @@
-module github.com/stainless-sdks/lablink-v4-client-go
+module github.com/minerofish/lablink-v4-client-go
 
 go 1.22
 

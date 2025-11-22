@@ -7,9 +7,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stainless-sdks/lablink-v4-client-go"
-	"github.com/stainless-sdks/lablink-v4-client-go/internal/testutil"
-	"github.com/stainless-sdks/lablink-v4-client-go/option"
+	"github.com/minerofish/lablink-v4-client-go"
+	"github.com/minerofish/lablink-v4-client-go/internal/testutil"
+	"github.com/minerofish/lablink-v4-client-go/option"
 )
 
 func TestUsage(t *testing.T) {
