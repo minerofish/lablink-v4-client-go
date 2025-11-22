@@ -41,10 +41,13 @@ import (
 	"fmt"
 
 	"github.com/stainless-sdks/lablink-v4-client-go"
+	"github.com/stainless-sdks/lablink-v4-client-go/option"
 )
 
 func main() {
-	client := lablinkv4client.NewClient()
+	client := lablinkv4client.NewClient(
+		option.WithBearerToken("My Bearer Token"),
+	)
 	bloodlabOrganizationRelations, err := client.Bloodlab.ListExaminations(context.TODO())
 	if err != nil {
 		panic(err.Error())

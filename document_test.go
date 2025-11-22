@@ -26,6 +26,7 @@ func TestDocumentGet(t *testing.T) {
 	baseURL := server.URL
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
 	resp, err := client.Documents.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
@@ -62,6 +63,7 @@ func TestDocumentListWithOptionalParams(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Documents.List(context.TODO(), lablinkv4client.DocumentListParams{
