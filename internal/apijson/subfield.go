@@ -1,7 +1,7 @@
 package apijson
 
 import (
-	"github.com/stainless-sdks/lablink-v4-client-go/packages/respjson"
+	"github.com/minerofish/lablink-v4-client-go/packages/respjson"
 	"reflect"
 )
 

@@ -7,17 +7,10 @@ import (
 	"os"
 
 	lablink "github.com/minerofish/lablink-v4-client-go"
-	"github.com/minerofish/lablink-v4-client-go/option"
 )
 
 func main() {
 	baseURL := "https://lablink.bloodlab.org"
-
-	// test With API Key Client
-	// testWithAPIKeyClient(baseURL, "your-api-key")
-	// return
-
-	// test With Authenticated Client
 	username := "your-username"
 	password := "your-password"
 
@@ -79,30 +72,12 @@ func testWithAuthenticatedClient(baseURL, username, password string) {
 		fmt.Printf("err should be nil: %s", err.Error())
 	}
 
+	if response2 == nil {
+		fmt.Println("response is nil - something went wrong")
+		return
+	}
+
 	for i, examination := range *response2 {
-		fmt.Printf("%d: %+v\n", i, examination)
-	}
-}
-
-func testWithAPIKeyClient(baseURL, apiKey string) {
-	apiKeyClient := lablink.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithAPIKey(apiKey),
-	)
-
-	response, err := apiKeyClient.Laboratories.Orders.List(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", lablink.LaboratoryOrderListParams{
-		Page:     lablink.Int(0),
-		PageSize: lablink.Int(200),
-	})
-	if err != nil {
-		var apierr *lablink.Error
-		if errors.As(err, &apierr) {
-			fmt.Println(string(apierr.DumpRequest(true)))
-		}
-		fmt.Printf("err should be nil: %s", err.Error())
-	}
-
-	for i, examination := range *response {
 		fmt.Printf("%d: %+v\n", i, examination)
 	}
 }
