@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1 (2025-11-22)
+
+Full Changelog: [v0.1.0...v0.1.1](https://github.com/minerofish/lablink-v4-client-go/compare/v0.1.0...v0.1.1)
+
+### Documentation
+
+* update examples ([abd2c39](https://github.com/minerofish/lablink-v4-client-go/commit/abd2c393c1c654d1bd152949334db6e097e98e5b))
+
 ## 0.1.0 (2025-11-22)
 
 Full Changelog: [v0.0.1...v0.1.0](https://github.com/minerofish/lablink-v4-client-go/compare/v0.0.1...v0.1.0)
