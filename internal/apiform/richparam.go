@@ -1,7 +1,7 @@
 package apiform
 
 import (
-	"github.com/stainless-sdks/lablink-v4-client-go/packages/param"
+	"github.com/minerofish/lablink-v4-client-go/packages/param"
 	"mime/multipart"
 	"reflect"
 )

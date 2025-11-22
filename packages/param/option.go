@@ -3,7 +3,7 @@ package param
 import (
 	"encoding/json"
 	"fmt"
-	shimjson "github.com/stainless-sdks/lablink-v4-client-go/internal/encoding/json"
+	shimjson "github.com/minerofish/lablink-v4-client-go/internal/encoding/json"
 	"time"
 )
 

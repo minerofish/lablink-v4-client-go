@@ -3,8 +3,8 @@
 package lablinkv4client
 
 import (
-	"github.com/stainless-sdks/lablink-v4-client-go/internal/apierror"
-	"github.com/stainless-sdks/lablink-v4-client-go/packages/param"
+	"github.com/minerofish/lablink-v4-client-go/internal/apierror"
+	"github.com/minerofish/lablink-v4-client-go/packages/param"
 )
 
 // aliased to make [param.APIUnion] private when embedding
