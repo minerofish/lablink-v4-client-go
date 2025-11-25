@@ -24,7 +24,7 @@ func TestOrganizationNewWithOptionalParams(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	_, err := client.Organizations.New(context.TODO(), lablinkv4client.OrganizationNewParams{
 		Body: []lablinkv4client.OrganizationNewParamsBody{{
@@ -51,7 +51,7 @@ func TestOrganizationUpdate(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	_, err := client.Organizations.Update(
 		context.TODO(),
@@ -80,7 +80,7 @@ func TestOrganizationListWithOptionalParams(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	_, err := client.Organizations.List(context.TODO(), lablinkv4client.OrganizationListParams{
 		Email:          []string{"user@example.com"},

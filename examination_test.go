@@ -24,7 +24,7 @@ func TestExaminationListWithOptionalParams(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	_, err := client.Examinations.List(context.TODO(), lablinkv4client.ExaminationListParams{
 		Code:           lablinkv4client.String("code"),

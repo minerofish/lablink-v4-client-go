@@ -271,8 +271,6 @@ type LaboratoryContractNewParamsBodyExamination struct {
 	// Customer specific code of the examination. If omitted, the suggestion from the
 	// procedure is used
 	Customercode param.Opt[string] `json:"customercode,omitzero"`
-	// Customer specific name of the examination, otherwise the procedure is used
-	Name param.Opt[string] `json:"name,omitzero"`
 	paramObj
 }
 

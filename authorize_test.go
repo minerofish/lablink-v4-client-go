@@ -24,7 +24,7 @@ func TestAuthorizeGetWithOptionalParams(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	_, err := client.Authorize.Get(context.TODO(), lablinkv4client.AuthorizeGetParams{
 		ClientID:            "client_id",

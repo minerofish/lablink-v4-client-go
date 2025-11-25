@@ -24,7 +24,7 @@ func TestLocationNew(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	_, err := client.Locations.New(context.TODO(), lablinkv4client.LocationNewParams{
 		Body: []lablinkv4client.LocationNewParamsBody{{
@@ -52,7 +52,7 @@ func TestLocationListWithOptionalParams(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	_, err := client.Locations.List(context.TODO(), lablinkv4client.LocationListParams{
 		FilterName: lablinkv4client.String("filterName"),
@@ -80,7 +80,7 @@ func TestLocationDelete(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	err := client.Locations.Delete(context.TODO(), lablinkv4client.LocationDeleteParams{
 		LocationID: "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
