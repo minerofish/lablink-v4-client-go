@@ -28,7 +28,8 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewLaboratoryContractService] method instead.
 type LaboratoryContractService struct {
-	Options []option.RequestOption
+	Options      []option.RequestOption
+	Examinations LaboratoryContractExaminationService
 }
 
 // NewLaboratoryContractService generates a new service that applies the given
@@ -37,6 +38,7 @@ type LaboratoryContractService struct {
 func NewLaboratoryContractService(opts ...option.RequestOption) (r LaboratoryContractService) {
 	r = LaboratoryContractService{}
 	r.Options = opts
+	r.Examinations = NewLaboratoryContractExaminationService(opts...)
 	return
 }
 
@@ -90,19 +92,6 @@ func (r *LaboratoryContractService) Delete(ctx context.Context, laboratoryID str
 	}
 	path := fmt.Sprintf("v4/laboratories/%s/contracts", laboratoryID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, body, nil, opts...)
-	return
-}
-
-// Retrieves a list of contracts along with organizations and laboratories that
-// have contracts.
-func (r *LaboratoryContractService) Query(ctx context.Context, laboratoryID string, params LaboratoryContractQueryParams, opts ...option.RequestOption) (res *LaboratoryContractQueryResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
-	if laboratoryID == "" {
-		err = errors.New("missing required laboratoryId parameter")
-		return
-	}
-	path := fmt.Sprintf("v4/laboratories/%s/contracts/query", laboratoryID)
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, params, &res, opts...)
 	return
 }
 
@@ -182,14 +171,28 @@ func (r *ContractOrganization) UnmarshalJSON(data []byte) error {
 }
 
 type LaboratoryContractGetResponse struct {
-	Items []Contract `json:"items"`
+	// The actual page number
+	CurrentPage int64                               `json:"currentPage"`
+	Items       []LaboratoryContractGetResponseItem `json:"items"`
+	// The number of items per page
+	PageSize int64 `json:"pageSize"`
+	// The total count of items
+	TotalCount int64 `json:"totalCount"`
+	// The total pages
+	TotalPages int64 `json:"totalPages"`
+	// The transaction identifier
+	TransactionID string `json:"transactionId" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Items       respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
+		CurrentPage   respjson.Field
+		Items         respjson.Field
+		PageSize      respjson.Field
+		TotalCount    respjson.Field
+		TotalPages    respjson.Field
+		TransactionID respjson.Field
+		ExtraFields   map[string]respjson.Field
+		raw           string
 	} `json:"-"`
-	Page
 }
 
 // Returns the unmodified JSON received from the API
@@ -198,20 +201,78 @@ func (r *LaboratoryContractGetResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type LaboratoryContractQueryResponse struct {
-	Items []Contract `json:"items"`
+type LaboratoryContractGetResponseItem struct {
+	// The contract ID
+	ID string `json:"id,required" format:"uuid"`
+	// The examinations included in the contract
+	Examinations []Examination                                 `json:"examinations,required"`
+	Laboratory   LaboratoryContractGetResponseItemLaboratory   `json:"laboratory,required"`
+	Organization LaboratoryContractGetResponseItemOrganization `json:"organization,required"`
+	// The contract creation date-time
+	CreatedAt time.Time `json:"createdAt" format:"date-time"`
+	// The contract last modification date-time
+	ModifiedAt time.Time `json:"modifiedAt" format:"date-time"`
+	// First day of validity
+	ValidFrom time.Time `json:"validFrom" format:"date-time"`
+	// The contract valid until date
+	ValidUntil time.Time `json:"validUntil" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Items       respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
+		ID           respjson.Field
+		Examinations respjson.Field
+		Laboratory   respjson.Field
+		Organization respjson.Field
+		CreatedAt    respjson.Field
+		ModifiedAt   respjson.Field
+		ValidFrom    respjson.Field
+		ValidUntil   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
 	} `json:"-"`
-	Page
 }
 
 // Returns the unmodified JSON received from the API
-func (r LaboratoryContractQueryResponse) RawJSON() string { return r.JSON.raw }
-func (r *LaboratoryContractQueryResponse) UnmarshalJSON(data []byte) error {
+func (r LaboratoryContractGetResponseItem) RawJSON() string { return r.JSON.raw }
+func (r *LaboratoryContractGetResponseItem) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type LaboratoryContractGetResponseItemLaboratory struct {
+	// The laboratory ID
+	ID   string `json:"id,required" format:"uuid"`
+	Name string `json:"name,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r LaboratoryContractGetResponseItemLaboratory) RawJSON() string { return r.JSON.raw }
+func (r *LaboratoryContractGetResponseItemLaboratory) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type LaboratoryContractGetResponseItemOrganization struct {
+	// The organization ID
+	ID string `json:"id,required" format:"uuid"`
+	// The organization name
+	Name string `json:"name,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r LaboratoryContractGetResponseItemOrganization) RawJSON() string { return r.JSON.raw }
+func (r *LaboratoryContractGetResponseItemOrganization) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -252,6 +313,10 @@ func (r *LaboratoryContractNewParamsBody) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Samplecode ranges are encoded as prefix + counter + postfixDigits. E.g. for
+// prefix "LAB", start 1, end 100, digits 5, postfixDigits 2 the following sample
+// codes are valid: LAB00001XX ... LAB00100XX
+//
 // The properties End, Start are required.
 type LaboratoryContractNewParamsBodySampleCodeRange struct {
 	// End of the sample code range
@@ -283,8 +348,6 @@ type LaboratoryContractNewParamsBodyExamination struct {
 	// Customer specific code of the examination. If omitted, the suggestion from the
 	// procedure is used
 	Customercode param.Opt[string] `json:"customercode,omitzero"`
-	// Customer specific name of the examination, otherwise the procedure is used
-	Name param.Opt[string] `json:"name,omitzero"`
 	paramObj
 }
 
@@ -381,33 +444,4 @@ func (r LaboratoryContractDeleteParams) MarshalJSON() (data []byte, err error) {
 }
 func (r *LaboratoryContractDeleteParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-type LaboratoryContractQueryParams struct {
-	Page     param.Opt[int64] `query:"Page,omitzero" json:"-"`
-	PageSize param.Opt[int64] `query:"PageSize,omitzero" json:"-"`
-	// The sorting parameters in the format of "fieldName,asc/desc". E.g. type,desc
-	//
-	// Any of "validFrom,asc", "validFrom,desc".
-	Sort []string `query:"sort,omitzero" json:"-"`
-	// Filter by Organization IDs
-	OrganizationIDs []string `json:"organizationIds,omitzero" format:"uuid"`
-	paramObj
-}
-
-func (r LaboratoryContractQueryParams) MarshalJSON() (data []byte, err error) {
-	type shadow LaboratoryContractQueryParams
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *LaboratoryContractQueryParams) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// URLQuery serializes [LaboratoryContractQueryParams]'s query parameters as
-// `url.Values`.
-func (r LaboratoryContractQueryParams) URLQuery() (v url.Values, err error) {
-	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
-		NestedFormat: apiquery.NestedQueryFormatBrackets,
-	})
 }

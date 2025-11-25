@@ -7,6 +7,7 @@ import (
 	"errors"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/minerofish/lablink-v4-client-go"
 	"github.com/minerofish/lablink-v4-client-go/internal/testutil"
@@ -25,7 +26,6 @@ func TestLaboratoryOrderUpdateWithOptionalParams(t *testing.T) {
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
 	)
 	err := client.Laboratories.Orders.Update(
 		context.TODO(),
@@ -57,14 +57,14 @@ func TestLaboratoryOrderListWithOptionalParams(t *testing.T) {
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Laboratories.Orders.List(
 		context.TODO(),
-		"laboratoryId",
+		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		lablinkv4client.LaboratoryOrderListParams{
 			Page:     lablinkv4client.Int(0),
 			PageSize: lablinkv4client.Int(1),
+			Since:    lablinkv4client.Time(time.Now()),
 		},
 	)
 	if err != nil {
