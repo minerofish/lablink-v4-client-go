@@ -24,7 +24,7 @@ func TestOrganizationQueryNewWithOptionalParams(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	_, err := client.Organizations.Query.New(context.TODO(), lablinkv4client.OrganizationQueryNewParams{
 		Page:            lablinkv4client.Int(0),

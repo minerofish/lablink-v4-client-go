@@ -24,7 +24,7 @@ func TestLaboratoryQueryExecuteWithOptionalParams(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	_, err := client.Laboratories.Query.Execute(context.TODO(), lablinkv4client.LaboratoryQueryExecuteParams{
 		Page:          lablinkv4client.Int(0),

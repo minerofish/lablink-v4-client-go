@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"slices"
+	"time"
 
 	"github.com/minerofish/lablink-v4-client-go/internal/apijson"
 	"github.com/minerofish/lablink-v4-client-go/internal/apiquery"
@@ -60,8 +61,8 @@ func (r *OrderQueryService) CommitTransaction(ctx context.Context, transactionID
 
 type OrderQueryNewResponse struct {
 	// The actual page number
-	CurrentPage int64 `json:"currentPage"`
-	Items       any   `json:"items"`
+	CurrentPage int64                       `json:"currentPage"`
+	Items       []OrderQueryNewResponseItem `json:"items"`
 	// The number of items per page
 	PageSize int64 `json:"pageSize"`
 	// The total count of items
@@ -86,6 +87,99 @@ type OrderQueryNewResponse struct {
 // Returns the unmodified JSON received from the API
 func (r OrderQueryNewResponse) RawJSON() string { return r.JSON.raw }
 func (r *OrderQueryNewResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type OrderQueryNewResponseItem struct {
+	// The ID of the order
+	ID string `json:"id,required" format:"uuid"`
+	// The blood donor data when type is DONOR
+	BloodDonor BloodDonor `json:"bloodDonor"`
+	// The bone-marrow donor data when type is BONE_MARROW_DONOR
+	BoneMarrowDonor BoneMarrowDonor `json:"boneMarrowDonor"`
+	// The documents associated with the order
+	Documents []OrderQueryNewResponseItemDocument `json:"documents"`
+	// The items belonging to the order. Each item represents one examination.
+	Items []OrderExamination `json:"items"`
+	// The laboratory ID where the order will be sent
+	LaboratoryID string `json:"laboratoryId" format:"uuid"`
+	// Identifier of the location
+	LocationID string `json:"locationId" format:"uuid"`
+	// The order creation date-time (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+	OrderCreationDateTime time.Time `json:"orderCreationDateTime" format:"date-time"`
+	// The tags belonging to the order
+	OrderTags []string `json:"orderTags"`
+	// The patient data when type is PERSONAL
+	Patient Patient `json:"patient"`
+	// The pseudonym data when type is PSEUDONYM
+	Pseudonym Pseudonym `json:"pseudonym"`
+	// Add information in key:value pairs object array that are stored with the order
+	References map[string]string `json:"references"`
+	// The order status model
+	//
+	// Any of "ENTERED", "WAITING_FOR_MATERIAL", "PROCESSING", "CONFIRMATION_PENDING",
+	// "FINAL", "DELETED", "ERROR".
+	State OrderStateType `json:"state"`
+	// The order type
+	//
+	// Any of "DONOR", "BONE_MARROW_DONOR", "PERSONAL", "PSEUDONYM".
+	Type OrderType `json:"type"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID                    respjson.Field
+		BloodDonor            respjson.Field
+		BoneMarrowDonor       respjson.Field
+		Documents             respjson.Field
+		Items                 respjson.Field
+		LaboratoryID          respjson.Field
+		LocationID            respjson.Field
+		OrderCreationDateTime respjson.Field
+		OrderTags             respjson.Field
+		Patient               respjson.Field
+		Pseudonym             respjson.Field
+		References            respjson.Field
+		State                 respjson.Field
+		Type                  respjson.Field
+		ExtraFields           map[string]respjson.Field
+		raw                   string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrderQueryNewResponseItem) RawJSON() string { return r.JSON.raw }
+func (r *OrderQueryNewResponseItem) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type OrderQueryNewResponseItemDocument struct {
+	// The document ID
+	DocumentID string `json:"documentId,required" format:"uuid"`
+	// The filename
+	FileName string `json:"fileName,required"`
+	// The file size (in bytes)
+	FileSize int64 `json:"fileSize,required"`
+	// The file type
+	FileType string `json:"fileType,required"`
+	// The links to the file
+	Link Link `json:"link,required"`
+	// The time when it got stored
+	StoredAt time.Time `json:"storedAt,required" format:"date-time"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		DocumentID  respjson.Field
+		FileName    respjson.Field
+		FileSize    respjson.Field
+		FileType    respjson.Field
+		Link        respjson.Field
+		StoredAt    respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrderQueryNewResponseItemDocument) RawJSON() string { return r.JSON.raw }
+func (r *OrderQueryNewResponseItemDocument) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 

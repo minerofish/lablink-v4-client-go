@@ -24,7 +24,7 @@ func TestTokenNew(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	_, err := client.Token.New(context.TODO(), lablinkv4client.TokenNewParams{
 		ClientID:     "client_id",

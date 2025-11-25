@@ -22,7 +22,7 @@ func TestUsage(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	bloodlabOrganizationRelations, err := client.Bloodlab.ListExaminations(context.TODO())
 	if err != nil {

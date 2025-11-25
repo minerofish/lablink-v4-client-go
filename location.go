@@ -87,8 +87,8 @@ func (r *Location) UnmarshalJSON(data []byte) error {
 
 type LocationListResponse struct {
 	// The actual page number
-	CurrentPage int64 `json:"currentPage"`
-	Items       any   `json:"items"`
+	CurrentPage int64                      `json:"currentPage"`
+	Items       []LocationListResponseItem `json:"items"`
 	// The number of items per page
 	PageSize int64 `json:"pageSize"`
 	// The total count of items
@@ -113,6 +113,29 @@ type LocationListResponse struct {
 // Returns the unmodified JSON received from the API
 func (r LocationListResponse) RawJSON() string { return r.JSON.raw }
 func (r *LocationListResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type LocationListResponseItem struct {
+	// The ID
+	ID string `json:"id,required" format:"uuid"`
+	// The name
+	Name string `json:"name,required"`
+	// The organization ID which the location belongs to
+	OrganizationID string `json:"organizationId,required" format:"uuid"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID             respjson.Field
+		Name           respjson.Field
+		OrganizationID respjson.Field
+		ExtraFields    map[string]respjson.Field
+		raw            string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r LocationListResponseItem) RawJSON() string { return r.JSON.raw }
+func (r *LocationListResponseItem) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 

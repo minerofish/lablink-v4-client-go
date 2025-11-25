@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"net/url"
 	"slices"
+	"time"
 
 	"github.com/minerofish/lablink-v4-client-go/internal/apiform"
 	"github.com/minerofish/lablink-v4-client-go/internal/apijson"
@@ -204,8 +205,8 @@ func (r *LaboratoryNewResponse) UnmarshalJSON(data []byte) error {
 
 type LaboratoryQueryContractsResponse struct {
 	// The actual page number
-	CurrentPage int64 `json:"currentPage"`
-	Items       any   `json:"items"`
+	CurrentPage int64                                  `json:"currentPage"`
+	Items       []LaboratoryQueryContractsResponseItem `json:"items"`
 	// The number of items per page
 	PageSize int64 `json:"pageSize"`
 	// The total count of items
@@ -230,6 +231,81 @@ type LaboratoryQueryContractsResponse struct {
 // Returns the unmodified JSON received from the API
 func (r LaboratoryQueryContractsResponse) RawJSON() string { return r.JSON.raw }
 func (r *LaboratoryQueryContractsResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type LaboratoryQueryContractsResponseItem struct {
+	// The contract ID
+	ID string `json:"id,required" format:"uuid"`
+	// The examinations included in the contract
+	Examinations []Examination                                    `json:"examinations,required"`
+	Laboratory   LaboratoryQueryContractsResponseItemLaboratory   `json:"laboratory,required"`
+	Organization LaboratoryQueryContractsResponseItemOrganization `json:"organization,required"`
+	// The contract creation date-time
+	CreatedAt time.Time `json:"createdAt" format:"date-time"`
+	// The contract last modification date-time
+	ModifiedAt time.Time `json:"modifiedAt" format:"date-time"`
+	// First day of validity
+	ValidFrom time.Time `json:"validFrom" format:"date-time"`
+	// The contract valid until date
+	ValidUntil time.Time `json:"validUntil" format:"date-time"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID           respjson.Field
+		Examinations respjson.Field
+		Laboratory   respjson.Field
+		Organization respjson.Field
+		CreatedAt    respjson.Field
+		ModifiedAt   respjson.Field
+		ValidFrom    respjson.Field
+		ValidUntil   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r LaboratoryQueryContractsResponseItem) RawJSON() string { return r.JSON.raw }
+func (r *LaboratoryQueryContractsResponseItem) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type LaboratoryQueryContractsResponseItemLaboratory struct {
+	// The laboratory ID
+	ID   string `json:"id,required" format:"uuid"`
+	Name string `json:"name,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r LaboratoryQueryContractsResponseItemLaboratory) RawJSON() string { return r.JSON.raw }
+func (r *LaboratoryQueryContractsResponseItemLaboratory) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type LaboratoryQueryContractsResponseItemOrganization struct {
+	// The organization ID
+	ID string `json:"id,required" format:"uuid"`
+	// The organization name
+	Name string `json:"name,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r LaboratoryQueryContractsResponseItemOrganization) RawJSON() string { return r.JSON.raw }
+func (r *LaboratoryQueryContractsResponseItemOrganization) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 

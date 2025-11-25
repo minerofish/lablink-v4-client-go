@@ -28,7 +28,7 @@ func TestLaboratoryNew(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	_, err := client.Laboratories.New(context.TODO(), lablinkv4client.LaboratoryNewParams{
 		Body: []lablinkv4client.LaboratoryNewParamsBody{{
@@ -62,7 +62,7 @@ func TestLaboratoryListWithOptionalParams(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	_, err := client.Laboratories.List(context.TODO(), lablinkv4client.LaboratoryListParams{
 		LaboratoryID: lablinkv4client.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
@@ -87,7 +87,7 @@ func TestLaboratoryDelete(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	err := client.Laboratories.Delete(context.TODO(), lablinkv4client.LaboratoryDeleteParams{
 		LaboratoryID: "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
@@ -112,7 +112,7 @@ func TestLaboratoryQueryContractsWithOptionalParams(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	_, err := client.Laboratories.QueryContracts(
 		context.TODO(),
@@ -144,7 +144,7 @@ func TestLaboratoryUploadDocument(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	err := client.Laboratories.UploadDocument(
 		context.TODO(),
@@ -175,7 +175,7 @@ func TestLaboratoryUploadResults(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	err := client.Laboratories.UploadResults(
 		context.TODO(),

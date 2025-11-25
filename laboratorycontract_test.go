@@ -25,7 +25,7 @@ func TestLaboratoryContractNew(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	_, err := client.Laboratories.Contracts.New(
 		context.TODO(),
@@ -43,7 +43,6 @@ func TestLaboratoryContractNew(t *testing.T) {
 				Examinations: []lablinkv4client.LaboratoryContractNewParamsBodyExamination{{
 					ProcedureID:  "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 					Customercode: lablinkv4client.String("customercode"),
-					Name:         lablinkv4client.String("name"),
 				}},
 				ValidFrom: lablinkv4client.Time(time.Now()),
 				ValidTo:   lablinkv4client.Time(time.Now()),
@@ -70,7 +69,7 @@ func TestLaboratoryContractGetWithOptionalParams(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	_, err := client.Laboratories.Contracts.Get(
 		context.TODO(),
@@ -102,7 +101,7 @@ func TestLaboratoryContractUpdate(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	err := client.Laboratories.Contracts.Update(
 		context.TODO(),
@@ -141,7 +140,7 @@ func TestLaboratoryContractDelete(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	err := client.Laboratories.Contracts.Delete(
 		context.TODO(),

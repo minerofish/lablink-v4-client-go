@@ -28,7 +28,8 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewLaboratoryContractService] method instead.
 type LaboratoryContractService struct {
-	Options []option.RequestOption
+	Options      []option.RequestOption
+	Examinations LaboratoryContractExaminationService
 }
 
 // NewLaboratoryContractService generates a new service that applies the given
@@ -37,6 +38,7 @@ type LaboratoryContractService struct {
 func NewLaboratoryContractService(opts ...option.RequestOption) (r LaboratoryContractService) {
 	r = LaboratoryContractService{}
 	r.Options = opts
+	r.Examinations = NewLaboratoryContractExaminationService(opts...)
 	return
 }
 
@@ -170,8 +172,8 @@ func (r *ContractOrganization) UnmarshalJSON(data []byte) error {
 
 type LaboratoryContractGetResponse struct {
 	// The actual page number
-	CurrentPage int64 `json:"currentPage"`
-	Items       any   `json:"items"`
+	CurrentPage int64                               `json:"currentPage"`
+	Items       []LaboratoryContractGetResponseItem `json:"items"`
 	// The number of items per page
 	PageSize int64 `json:"pageSize"`
 	// The total count of items
@@ -196,6 +198,81 @@ type LaboratoryContractGetResponse struct {
 // Returns the unmodified JSON received from the API
 func (r LaboratoryContractGetResponse) RawJSON() string { return r.JSON.raw }
 func (r *LaboratoryContractGetResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type LaboratoryContractGetResponseItem struct {
+	// The contract ID
+	ID string `json:"id,required" format:"uuid"`
+	// The examinations included in the contract
+	Examinations []Examination                                 `json:"examinations,required"`
+	Laboratory   LaboratoryContractGetResponseItemLaboratory   `json:"laboratory,required"`
+	Organization LaboratoryContractGetResponseItemOrganization `json:"organization,required"`
+	// The contract creation date-time
+	CreatedAt time.Time `json:"createdAt" format:"date-time"`
+	// The contract last modification date-time
+	ModifiedAt time.Time `json:"modifiedAt" format:"date-time"`
+	// First day of validity
+	ValidFrom time.Time `json:"validFrom" format:"date-time"`
+	// The contract valid until date
+	ValidUntil time.Time `json:"validUntil" format:"date-time"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID           respjson.Field
+		Examinations respjson.Field
+		Laboratory   respjson.Field
+		Organization respjson.Field
+		CreatedAt    respjson.Field
+		ModifiedAt   respjson.Field
+		ValidFrom    respjson.Field
+		ValidUntil   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r LaboratoryContractGetResponseItem) RawJSON() string { return r.JSON.raw }
+func (r *LaboratoryContractGetResponseItem) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type LaboratoryContractGetResponseItemLaboratory struct {
+	// The laboratory ID
+	ID   string `json:"id,required" format:"uuid"`
+	Name string `json:"name,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r LaboratoryContractGetResponseItemLaboratory) RawJSON() string { return r.JSON.raw }
+func (r *LaboratoryContractGetResponseItemLaboratory) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type LaboratoryContractGetResponseItemOrganization struct {
+	// The organization ID
+	ID string `json:"id,required" format:"uuid"`
+	// The organization name
+	Name string `json:"name,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r LaboratoryContractGetResponseItemOrganization) RawJSON() string { return r.JSON.raw }
+func (r *LaboratoryContractGetResponseItemOrganization) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -271,8 +348,6 @@ type LaboratoryContractNewParamsBodyExamination struct {
 	// Customer specific code of the examination. If omitted, the suggestion from the
 	// procedure is used
 	Customercode param.Opt[string] `json:"customercode,omitzero"`
-	// Customer specific name of the examination, otherwise the procedure is used
-	Name param.Opt[string] `json:"name,omitzero"`
 	paramObj
 }
 

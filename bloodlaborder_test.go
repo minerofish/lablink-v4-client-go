@@ -24,7 +24,7 @@ func TestBloodlabOrderListNewOrders(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	_, err := client.Bloodlab.Orders.ListNewOrders(context.TODO())
 	if err != nil {
@@ -47,7 +47,7 @@ func TestBloodlabOrderMarkAsDownloaded(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	err := client.Bloodlab.Orders.MarkAsDownloaded(context.TODO(), lablinkv4client.BloodlabOrderMarkAsDownloadedParams{
 		Body: []string{"string"},
@@ -72,7 +72,7 @@ func TestBloodlabOrderSetState(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	err := client.Bloodlab.Orders.SetState(context.TODO(), lablinkv4client.BloodlabOrderSetStateParams{
 		Body: []lablinkv4client.BloodlabOrderSetStateParamsBody{{

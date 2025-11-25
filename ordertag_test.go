@@ -24,7 +24,7 @@ func TestOrderTagDelete(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	err := client.Orders.Tags.Delete(context.TODO(), lablinkv4client.OrderTagDeleteParams{
 		OrderIDs: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
@@ -50,7 +50,7 @@ func TestOrderTagTag(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	err := client.Orders.Tags.Tag(context.TODO(), lablinkv4client.OrderTagTagParams{
 		OrderIDs: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},

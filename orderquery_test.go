@@ -24,7 +24,7 @@ func TestOrderQueryNewWithOptionalParams(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	_, err := client.Orders.Query.New(context.TODO(), lablinkv4client.OrderQueryNewParams{
 		Expand:          []string{"documents"},
@@ -61,7 +61,7 @@ func TestOrderQueryCommitTransactionWithOptionalParams(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	_, err := client.Orders.Query.CommitTransaction(
 		context.TODO(),

@@ -24,7 +24,7 @@ func TestBloodlabListExaminations(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	_, err := client.Bloodlab.ListExaminations(context.TODO())
 	if err != nil {
@@ -47,7 +47,7 @@ func TestBloodlabListOrganizationRelations(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithBearerToken("My Bearer Token"),
 	)
 	_, err := client.Bloodlab.ListOrganizationRelations(context.TODO())
 	if err != nil {
