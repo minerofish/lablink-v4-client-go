@@ -92,7 +92,7 @@ func TestOrderExaminationRemove(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		lablinkv4client.OrderExaminationRemoveParams{
-			PostionID: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
+			ItemID: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
 		},
 	)
 	if err != nil {

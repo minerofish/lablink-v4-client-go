@@ -35,6 +35,7 @@ func TestProcedureNew(t *testing.T) {
 				Code:         lablinkv4client.String("code"),
 				CodingSystem: lablinkv4client.CodingSystemLoinc,
 			}},
+			DataType:    "int",
 			Description: lablinkv4client.String("description"),
 			Unit:        lablinkv4client.String("unit"),
 		}},
@@ -71,6 +72,7 @@ func TestProcedureUpdateWithOptionalParams(t *testing.T) {
 				Code:         lablinkv4client.String("code"),
 				CodingSystem: lablinkv4client.CodingSystemLoinc,
 			}},
+			DataType:    lablinkv4client.ProcedureUpdateParamsDataTypeInt,
 			Description: lablinkv4client.String("description"),
 			Name:        lablinkv4client.String("name"),
 			Unit:        lablinkv4client.String("unit"),
@@ -102,6 +104,7 @@ func TestProcedureListWithOptionalParams(t *testing.T) {
 	_, err := client.Procedures.List(context.TODO(), lablinkv4client.ProcedureListParams{
 		Codes:      []string{"string"},
 		CodeSystem: lablinkv4client.CodingSystemLoinc,
+		DataType:   lablinkv4client.ProcedureListParamsDataTypeInt,
 		Name:       lablinkv4client.String("name"),
 		Page:       lablinkv4client.Int(0),
 		PageSize:   lablinkv4client.Int(1),

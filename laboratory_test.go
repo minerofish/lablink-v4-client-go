@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/minerofish/lablink-v4-client-go"
 	"github.com/minerofish/lablink-v4-client-go/internal/testutil"
@@ -102,74 +103,6 @@ func TestLaboratoryDelete(t *testing.T) {
 	}
 }
 
-func TestLaboratoryQueryWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := lablinkv4client.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
-	)
-	_, err := client.Laboratories.Query(context.TODO(), lablinkv4client.LaboratoryQueryParams{
-		Page:          lablinkv4client.Int(0),
-		PageSize:      lablinkv4client.Int(1),
-		Sort:          []string{"name,asc"},
-		LaboratoryIDs: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
-		Name:          lablinkv4client.String("name"),
-	})
-	if err != nil {
-		var apierr *lablinkv4client.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
-func TestLaboratoryUploadConfirmatoryResults(t *testing.T) {
-	t.Skip("Prism tests are disabled")
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := lablinkv4client.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
-	)
-	_, err := client.Laboratories.UploadConfirmatoryResults(
-		context.TODO(),
-		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-		lablinkv4client.LaboratoryUploadConfirmatoryResultsParams{
-			Body: []lablinkv4client.LaboratoryUploadConfirmatoryResultsParamsBody{{
-				Examination:         "examination",
-				SampleCode:          "sampleCode",
-				YieldDate:           "yieldDate",
-				ConfirmatoryGroupID: lablinkv4client.Int(0),
-				Customer:            lablinkv4client.String("customer"),
-				QualifiedResult:     lablinkv4client.String("qualifiedResult"),
-				QuantitativeResult:  lablinkv4client.String("quantitativeResult"),
-			}},
-		},
-	)
-	if err != nil {
-		var apierr *lablinkv4client.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
 func TestLaboratoryUploadDocument(t *testing.T) {
 	t.Skip("Prism tests are disabled")
 	baseURL := "http://localhost:4010"
@@ -186,11 +119,11 @@ func TestLaboratoryUploadDocument(t *testing.T) {
 	)
 	err := client.Laboratories.UploadDocument(
 		context.TODO(),
-		"laboratoryId",
+		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		lablinkv4client.LaboratoryUploadDocumentParams{
-			Examination: "examination",
-			File:        io.Reader(bytes.NewBuffer([]byte("some file contents"))),
-			SampleCode:  "sampleCode",
+			File:    io.Reader(bytes.NewBuffer([]byte("some file contents"))),
+			OrderID: "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+			Type:    lablinkv4client.LaboratoryUploadDocumentParamsTypeLabReport,
 		},
 	)
 	if err != nil {
@@ -216,17 +149,23 @@ func TestLaboratoryUploadResults(t *testing.T) {
 		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Laboratories.UploadResults(
+	err := client.Laboratories.UploadResults(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		lablinkv4client.LaboratoryUploadResultsParams{
 			Body: []lablinkv4client.LaboratoryUploadResultsParamsBody{{
-				Examination:        "examination",
-				SampleCode:         "sampleCode",
-				YieldDate:          "yieldDate",
-				Customer:           lablinkv4client.String("customer"),
-				QualifiedResult:    lablinkv4client.String("qualifiedResult"),
-				QuantitativeResult: lablinkv4client.String("quantitativeResult"),
+				ExaminationID:       "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+				ItemID:              "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+				OrderID:             "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+				Result:              "result",
+				Status:              "FINAL",
+				ConfirmationPending: lablinkv4client.Bool(true),
+				DataType:            "int",
+				InfoText:            lablinkv4client.String("infoText"),
+				PerformedAt:         lablinkv4client.Time(time.Now()),
+				Unit:                lablinkv4client.String("unit"),
+				ValidatedAt:         lablinkv4client.Time(time.Now()),
+				ValidatedBy:         lablinkv4client.String("validatedBy"),
 			}},
 		},
 	)

@@ -71,7 +71,7 @@ type BloodlabOrderListNewOrdersResponse struct {
 	LocationID string `json:"locationId,required"`
 	// The order type
 	//
-	// Any of "DONOR", "BONE_MARROW_DONOR", "PERSONAL", "PSEUDONYMIZED".
+	// Any of "DONOR", "BONE_MARROW_DONOR", "PERSONAL", "PSEUDONYM".
 	Type OrderType `json:"type,required"`
 	// The ID of the order
 	ID string `json:"id" format:"uuid"`
@@ -83,16 +83,16 @@ type BloodlabOrderListNewOrdersResponse struct {
 	OrderCreationDateTime time.Time `json:"orderCreationDateTime" format:"date-time"`
 	// The patient data when type is PERSONAL
 	Patient BloodlabOrderListNewOrdersResponsePatient `json:"patient"`
-	// The pseudonym data when type is PSEUDONYMIZED
+	// The pseudonym data when type is PSEUDONYM
 	Pseudonym BloodlabOrderListNewOrdersResponsePseudonym `json:"pseudonym"`
 	// The external unique identifier of the order
 	Reference string `json:"reference"`
 	// Additional external information in key:value pairs object array
 	ReferenceMap []map[string]string `json:"referenceMap"`
-	// The order state
+	// The order status model
 	//
-	// Any of "ACCEPTED", "CONFIRMATORY", "DELETED", "ENTERED", "ERROR", "FINALIZED",
-	// "PENDING", "PROCESSING", "WAITING_FOR_MATERIAL".
+	// Any of "ENTERED", "WAITING_FOR_MATERIAL", "PROCESSING", "CONFIRMATION_PENDING",
+	// "FINAL", "DELETED", "ERROR".
 	State OrderStateType `json:"state"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -130,7 +130,7 @@ type BloodlabOrderListNewOrdersResponseExamination struct {
 	// The external unique identifier of the order
 	Reference string `json:"reference"`
 	// The results belonging to the order
-	Results []OrderResult `json:"results"`
+	Results []BloodlabOrderListNewOrdersResponseExaminationResult `json:"results"`
 	// The sample codes
 	SampleCodes []string `json:"sampleCodes"`
 	// The sample date
@@ -155,6 +155,52 @@ type BloodlabOrderListNewOrdersResponseExamination struct {
 // Returns the unmodified JSON received from the API
 func (r BloodlabOrderListNewOrdersResponseExamination) RawJSON() string { return r.JSON.raw }
 func (r *BloodlabOrderListNewOrdersResponseExamination) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type BloodlabOrderListNewOrdersResponseExaminationResult struct {
+	// The order-examination ID.
+	ExaminationID string `json:"examinationId,required" format:"uuid"`
+	// The order-examination item ID
+	ItemID string `json:"itemId,required" format:"uuid"`
+	// The order ID
+	OrderID string `json:"orderId,required" format:"uuid"`
+	Result  string `json:"result,required"`
+	// Any of "FINAL", "PRELIMINARY", "CORRECTED".
+	Status string `json:"status,required"`
+	// Indicates if the result requires confirmation.
+	ConfirmationPending bool `json:"confirmationPending"`
+	// The data type of the result
+	//
+	// Any of "int", "decimal", "string", "pein", "react", "invalid", "enum".
+	DataType    string    `json:"dataType"`
+	InfoText    string    `json:"infoText"`
+	PerformedAt time.Time `json:"performedAt" format:"date-time"`
+	Unit        string    `json:"unit"`
+	ValidatedAt time.Time `json:"validatedAt" format:"date-time"`
+	ValidatedBy string    `json:"validatedBy"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ExaminationID       respjson.Field
+		ItemID              respjson.Field
+		OrderID             respjson.Field
+		Result              respjson.Field
+		Status              respjson.Field
+		ConfirmationPending respjson.Field
+		DataType            respjson.Field
+		InfoText            respjson.Field
+		PerformedAt         respjson.Field
+		Unit                respjson.Field
+		ValidatedAt         respjson.Field
+		ValidatedBy         respjson.Field
+		ExtraFields         map[string]respjson.Field
+		raw                 string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r BloodlabOrderListNewOrdersResponseExaminationResult) RawJSON() string { return r.JSON.raw }
+func (r *BloodlabOrderListNewOrdersResponseExaminationResult) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -273,7 +319,7 @@ func (r *BloodlabOrderListNewOrdersResponsePatient) UnmarshalJSON(data []byte) e
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// The pseudonym data when type is PSEUDONYMIZED
+// The pseudonym data when type is PSEUDONYM
 type BloodlabOrderListNewOrdersResponsePseudonym struct {
 	// The code
 	Code string `json:"code"`
@@ -327,10 +373,10 @@ func (r *BloodlabOrderSetStateParams) UnmarshalJSON(data []byte) error {
 type BloodlabOrderSetStateParamsBody struct {
 	// The order ID which state will be changed
 	OrderID string `json:"orderId,required" format:"uuid"`
-	// The new state
+	// The order status model
 	//
-	// Any of "ACCEPTED", "CONFIRMATORY", "DELETED", "ENTERED", "ERROR", "FINALIZED",
-	// "PENDING", "PROCESSING", "WAITING_FOR_MATERIAL".
+	// Any of "ENTERED", "WAITING_FOR_MATERIAL", "PROCESSING", "CONFIRMATION_PENDING",
+	// "FINAL", "DELETED", "ERROR".
 	State OrderStateType `json:"state,omitzero,required"`
 	paramObj
 }

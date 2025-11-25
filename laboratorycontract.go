@@ -93,19 +93,6 @@ func (r *LaboratoryContractService) Delete(ctx context.Context, laboratoryID str
 	return
 }
 
-// Retrieves a list of contracts along with organizations and laboratories that
-// have contracts.
-func (r *LaboratoryContractService) Query(ctx context.Context, laboratoryID string, params LaboratoryContractQueryParams, opts ...option.RequestOption) (res *LaboratoryContractQueryResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
-	if laboratoryID == "" {
-		err = errors.New("missing required laboratoryId parameter")
-		return
-	}
-	path := fmt.Sprintf("v4/laboratories/%s/contracts/query", laboratoryID)
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, params, &res, opts...)
-	return
-}
-
 type Contract struct {
 	// The contract ID
 	ID string `json:"id,required" format:"uuid"`
@@ -198,23 +185,6 @@ func (r *LaboratoryContractGetResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type LaboratoryContractQueryResponse struct {
-	Items []Contract `json:"items"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Items       respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-	Page
-}
-
-// Returns the unmodified JSON received from the API
-func (r LaboratoryContractQueryResponse) RawJSON() string { return r.JSON.raw }
-func (r *LaboratoryContractQueryResponse) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
 type LaboratoryContractNewParams struct {
 	// application/glims+json upload glims structured results in json format
 	Body []LaboratoryContractNewParamsBody
@@ -252,6 +222,10 @@ func (r *LaboratoryContractNewParamsBody) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Samplecode ranges are encoded as prefix + counter + postfixDigits. E.g. for
+// prefix "LAB", start 1, end 100, digits 5, postfixDigits 2 the following sample
+// codes are valid: LAB00001XX ... LAB00100XX
+//
 // The properties End, Start are required.
 type LaboratoryContractNewParamsBodySampleCodeRange struct {
 	// End of the sample code range
@@ -381,33 +355,4 @@ func (r LaboratoryContractDeleteParams) MarshalJSON() (data []byte, err error) {
 }
 func (r *LaboratoryContractDeleteParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-type LaboratoryContractQueryParams struct {
-	Page     param.Opt[int64] `query:"Page,omitzero" json:"-"`
-	PageSize param.Opt[int64] `query:"PageSize,omitzero" json:"-"`
-	// The sorting parameters in the format of "fieldName,asc/desc". E.g. type,desc
-	//
-	// Any of "validFrom,asc", "validFrom,desc".
-	Sort []string `query:"sort,omitzero" json:"-"`
-	// Filter by Organization IDs
-	OrganizationIDs []string `json:"organizationIds,omitzero" format:"uuid"`
-	paramObj
-}
-
-func (r LaboratoryContractQueryParams) MarshalJSON() (data []byte, err error) {
-	type shadow LaboratoryContractQueryParams
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *LaboratoryContractQueryParams) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// URLQuery serializes [LaboratoryContractQueryParams]'s query parameters as
-// `url.Values`.
-func (r LaboratoryContractQueryParams) URLQuery() (v url.Values, err error) {
-	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
-		NestedFormat: apiquery.NestedQueryFormatBrackets,
-	})
 }

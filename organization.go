@@ -59,19 +59,11 @@ func (r *OrganizationService) Update(ctx context.Context, organizationID string,
 	return
 }
 
-// Retrieves all organizations for the authenticated user.
+// Retrieves all organizations.
 func (r *OrganizationService) List(ctx context.Context, query OrganizationListParams, opts ...option.RequestOption) (res *[]Organization, err error) {
 	opts = slices.Concat(r.Options, opts)
 	path := "v4/organizations"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
-}
-
-// Query Organizations with filters in request body
-func (r *OrganizationService) Query(ctx context.Context, params OrganizationQueryParams, opts ...option.RequestOption) (res *OrganizationQueryResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
-	path := "v4/organizations/query"
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, params, &res, opts...)
 	return
 }
 
@@ -81,7 +73,6 @@ type Organization struct {
 	ContractLaboratories []OrganizationContractLaboratory `json:"contract_laboratories"`
 	CreatedBy            string                           `json:"created_by"`
 	Locations            []Location                       `json:"locations"`
-	SampleCodeRanges     []OrganizationSampleCodeRange    `json:"sample_code_ranges"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                   respjson.Field
@@ -89,7 +80,6 @@ type Organization struct {
 		ContractLaboratories respjson.Field
 		CreatedBy            respjson.Field
 		Locations            respjson.Field
-		SampleCodeRanges     respjson.Field
 		ExtraFields          map[string]respjson.Field
 		raw                  string
 	} `json:"-"`
@@ -137,28 +127,6 @@ func (r *OrganizationContractLaboratory) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type OrganizationSampleCodeRange struct {
-	Max            int64  `json:"max,required"`
-	Min            int64  `json:"min,required"`
-	OrganizationID string `json:"organizationId,required" format:"uuid"`
-	Prefix         string `json:"prefix,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Max            respjson.Field
-		Min            respjson.Field
-		OrganizationID respjson.Field
-		Prefix         respjson.Field
-		ExtraFields    map[string]respjson.Field
-		raw            string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r OrganizationSampleCodeRange) RawJSON() string { return r.JSON.raw }
-func (r *OrganizationSampleCodeRange) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
 type OrganizationRole string
 
 const (
@@ -166,23 +134,6 @@ const (
 	OrganizationRoleUser              OrganizationRole = "USER"
 	OrganizationRoleAPIUser           OrganizationRole = "API_USER"
 )
-
-type OrganizationQueryResponse struct {
-	Items []Organization `json:"items"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Items       respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-	Page
-}
-
-// Returns the unmodified JSON received from the API
-func (r OrganizationQueryResponse) RawJSON() string { return r.JSON.raw }
-func (r *OrganizationQueryResponse) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
 
 type OrganizationNewParams struct {
 	Body []OrganizationNewParamsBody
@@ -225,51 +176,23 @@ func (r *OrganizationUpdateParams) UnmarshalJSON(data []byte) error {
 }
 
 type OrganizationListParams struct {
-	Name           param.Opt[string]  `query:"name,omitzero" json:"-"`
-	OrganizationID param.Opt[string]  `query:"organizationID,omitzero" format:"uuid" json:"-"`
-	Page           param.Opt[int64]   `query:"page,omitzero" json:"-"`
-	PageSize       param.Opt[int64]   `query:"pageSize,omitzero" json:"-"`
-	Email          []string           `query:"email,omitzero" format:"email" json:"-"`
-	Roles          []OrganizationRole `query:"roles,omitzero" json:"-"`
+	// Filter by name. Thhis supports partial matches.
+	Name param.Opt[string] `query:"name,omitzero" json:"-"`
+	// Filter by organization IDs. If omitted all organizations are returned.
+	OrganizationID param.Opt[string] `query:"organizationID,omitzero" format:"uuid" json:"-"`
+	// Page number, starts at 0.
+	Page param.Opt[int64] `query:"page,omitzero" json:"-"`
+	// Number of items per page. Maximum is 200.
+	PageSize param.Opt[int64] `query:"pageSize,omitzero" json:"-"`
+	// Filter by email addresses associated with the organizations.
+	Email []string `query:"email,omitzero" format:"email" json:"-"`
+	// Filter by organization roles.
+	Roles []OrganizationRole `query:"roles,omitzero" json:"-"`
 	paramObj
 }
 
 // URLQuery serializes [OrganizationListParams]'s query parameters as `url.Values`.
 func (r OrganizationListParams) URLQuery() (v url.Values, err error) {
-	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
-		NestedFormat: apiquery.NestedQueryFormatBrackets,
-	})
-}
-
-type OrganizationQueryParams struct {
-	// Page number
-	Page param.Opt[int64] `query:"page,omitzero" json:"-"`
-	// Number of items per page
-	PageSize param.Opt[int64]  `query:"pageSize,omitzero" json:"-"`
-	Name     param.Opt[string] `json:"name,omitzero"`
-	// The sorting parameters in the format of "fieldName,asc/desc". E.g. state,desc
-	//
-	// Any of "name,asc", "name,desc", "created_at,asc", "created_at,desc".
-	Sort   []string `query:"sort,omitzero" json:"-"`
-	Emails []string `json:"emails,omitzero" format:"email"`
-	// Filter by order IDs
-	OrganizationIDs []string           `json:"organizationIDs,omitzero" format:"uuid"`
-	Roles           []OrganizationRole `json:"roles,omitzero"`
-	paramObj
-}
-
-func (r OrganizationQueryParams) MarshalJSON() (data []byte, err error) {
-	type shadow OrganizationQueryParams
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *OrganizationQueryParams) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// URLQuery serializes [OrganizationQueryParams]'s query parameters as
-// `url.Values`.
-func (r OrganizationQueryParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,

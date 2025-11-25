@@ -51,8 +51,9 @@ func (r *LaboratoryOrderService) Update(ctx context.Context, laboratoryID string
 	return
 }
 
-// Retrieve a list of orders
-func (r *LaboratoryOrderService) List(ctx context.Context, laboratoryID string, query LaboratoryOrderListParams, opts ...option.RequestOption) (res *[]LaboratoryOrderListResponse, err error) {
+// Downloads orders for a laboratory with pagination. With the download there is a
+// job-tag received.
+func (r *LaboratoryOrderService) List(ctx context.Context, laboratoryID string, query LaboratoryOrderListParams, opts ...option.RequestOption) (res *LaboratoryOrderListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if laboratoryID == "" {
 		err = errors.New("missing required laboratoryId parameter")
@@ -66,50 +67,53 @@ func (r *LaboratoryOrderService) List(ctx context.Context, laboratoryID string, 
 type Order struct {
 	// The ID of the order
 	ID string `json:"id,required" format:"uuid"`
-	// The examinations belonging to the order
-	Examinations []OrderExamination `json:"examinations,required"`
-	// The laboratory ID where the order will be sent
-	LaboratoryID string `json:"laboratoryId,required" format:"uuid"`
-	// Identifier of the location (client)
-	LocationID string `json:"locationId,required" format:"uuid"`
-	// The order creation date-time (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
-	OrderCreationDateTime time.Time `json:"orderCreationDateTime,required" format:"date-time"`
-	// The order state
-	//
-	// Any of "ACCEPTED", "CONFIRMATORY", "DELETED", "ENTERED", "ERROR", "FINALIZED",
-	// "PENDING", "PROCESSING", "WAITING_FOR_MATERIAL".
-	State OrderStateType `json:"state,required"`
-	// The order type
-	//
-	// Any of "DONOR", "BONE_MARROW_DONOR", "PERSONAL", "PSEUDONYMIZED".
-	Type OrderType `json:"type,required"`
 	// The blood donor data when type is DONOR
 	BloodDonor BloodDonor `json:"bloodDonor"`
 	// The bone-marrow donor data when type is BONE_MARROW_DONOR
 	BoneMarrowDonor BoneMarrowDonor `json:"boneMarrowDonor"`
+	// The documents associated with the order
+	Documents []OrderDocument `json:"documents"`
+	// The items belonging to the order. Each item represents one examination.
+	Items []OrderExamination `json:"items"`
+	// The laboratory ID where the order will be sent
+	LaboratoryID string `json:"laboratoryId" format:"uuid"`
+	// Identifier of the location
+	LocationID string `json:"locationId" format:"uuid"`
+	// The order creation date-time (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+	OrderCreationDateTime time.Time `json:"orderCreationDateTime" format:"date-time"`
 	// The tags belonging to the order
 	OrderTags []string `json:"orderTags"`
 	// The patient data when type is PERSONAL
 	Patient Patient `json:"patient"`
-	// The pseudonym data when type is PSEUDONYMIZED
+	// The pseudonym data when type is PSEUDONYM
 	Pseudonym Pseudonym `json:"pseudonym"`
 	// Add information in key:value pairs object array that are stored with the order
 	References map[string]string `json:"references"`
+	// The order status model
+	//
+	// Any of "ENTERED", "WAITING_FOR_MATERIAL", "PROCESSING", "CONFIRMATION_PENDING",
+	// "FINAL", "DELETED", "ERROR".
+	State OrderStateType `json:"state"`
+	// The order type
+	//
+	// Any of "DONOR", "BONE_MARROW_DONOR", "PERSONAL", "PSEUDONYM".
+	Type OrderType `json:"type"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                    respjson.Field
-		Examinations          respjson.Field
+		BloodDonor            respjson.Field
+		BoneMarrowDonor       respjson.Field
+		Documents             respjson.Field
+		Items                 respjson.Field
 		LaboratoryID          respjson.Field
 		LocationID            respjson.Field
 		OrderCreationDateTime respjson.Field
-		State                 respjson.Field
-		Type                  respjson.Field
-		BloodDonor            respjson.Field
-		BoneMarrowDonor       respjson.Field
 		OrderTags             respjson.Field
 		Patient               respjson.Field
 		Pseudonym             respjson.Field
 		References            respjson.Field
+		State                 respjson.Field
+		Type                  respjson.Field
 		ExtraFields           map[string]respjson.Field
 		raw                   string
 	} `json:"-"`
@@ -121,103 +125,52 @@ func (r *Order) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type LaboratoryOrderListResponse struct {
-	Examination  LaboratoryOrderListResponseExamination  `json:"examination"`
-	Laboratory   LaboratoryOrderListResponseLaboratory   `json:"laboratory"`
-	Location     LaboratoryOrderListResponseLocation     `json:"location"`
-	Order        Order                                   `json:"Order"`
-	Organization LaboratoryOrderListResponseOrganization `json:"organization"`
+type OrderDocument struct {
+	// The document ID
+	DocumentID string `json:"documentId,required" format:"uuid"`
+	// The filename
+	FileName string `json:"fileName,required"`
+	// The file size (in bytes)
+	FileSize int64 `json:"fileSize,required"`
+	// The file type
+	FileType string `json:"fileType,required"`
+	// The links to the file
+	Link Link `json:"link,required"`
+	// The time when it got stored
+	StoredAt time.Time `json:"storedAt,required" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Examination  respjson.Field
-		Laboratory   respjson.Field
-		Location     respjson.Field
-		Order        respjson.Field
-		Organization respjson.Field
-		ExtraFields  map[string]respjson.Field
-		raw          string
+		DocumentID  respjson.Field
+		FileName    respjson.Field
+		FileSize    respjson.Field
+		FileType    respjson.Field
+		Link        respjson.Field
+		StoredAt    respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
 	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrderDocument) RawJSON() string { return r.JSON.raw }
+func (r *OrderDocument) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type LaboratoryOrderListResponse struct {
+	Items []Order `json:"items"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Items       respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	Page
 }
 
 // Returns the unmodified JSON received from the API
 func (r LaboratoryOrderListResponse) RawJSON() string { return r.JSON.raw }
 func (r *LaboratoryOrderListResponse) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type LaboratoryOrderListResponseExamination struct {
-	ID   string `json:"id" format:"uuid"`
-	Code string `json:"code"`
-	Name string `json:"name"`
-	Unit string `json:"unit"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ID          respjson.Field
-		Code        respjson.Field
-		Name        respjson.Field
-		Unit        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r LaboratoryOrderListResponseExamination) RawJSON() string { return r.JSON.raw }
-func (r *LaboratoryOrderListResponseExamination) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type LaboratoryOrderListResponseLaboratory struct {
-	LaboratoryID string `json:"laboratoryId" format:"uuid"`
-	Name         string `json:"name"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		LaboratoryID respjson.Field
-		Name         respjson.Field
-		ExtraFields  map[string]respjson.Field
-		raw          string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r LaboratoryOrderListResponseLaboratory) RawJSON() string { return r.JSON.raw }
-func (r *LaboratoryOrderListResponseLaboratory) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type LaboratoryOrderListResponseLocation struct {
-	ID   string `json:"id" format:"uuid"`
-	Name string `json:"name"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ID          respjson.Field
-		Name        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r LaboratoryOrderListResponseLocation) RawJSON() string { return r.JSON.raw }
-func (r *LaboratoryOrderListResponseLocation) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type LaboratoryOrderListResponseOrganization struct {
-	Name           string `json:"name"`
-	OrganizationID string `json:"organizationId" format:"uuid"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Name           respjson.Field
-		OrganizationID respjson.Field
-		ExtraFields    map[string]respjson.Field
-		raw            string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r LaboratoryOrderListResponseOrganization) RawJSON() string { return r.JSON.raw }
-func (r *LaboratoryOrderListResponseOrganization) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -254,6 +207,8 @@ type LaboratoryOrderListParams struct {
 	Page param.Opt[int64] `query:"page,omitzero" json:"-"`
 	// Number of items per page
 	PageSize param.Opt[int64] `query:"pageSize,omitzero" json:"-"`
+	// Only orders updated since this timestamp are returned
+	Since param.Opt[time.Time] `query:"since,omitzero" format:"date-time" json:"-"`
 	paramObj
 }
 

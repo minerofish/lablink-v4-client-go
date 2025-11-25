@@ -80,7 +80,7 @@ func TestBloodlabOrderSetState(t *testing.T) {
 	err := client.Bloodlab.Orders.SetState(context.TODO(), lablinkv4client.BloodlabOrderSetStateParams{
 		Body: []lablinkv4client.BloodlabOrderSetStateParamsBody{{
 			OrderID: "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-			State:   lablinkv4client.OrderStateTypeAccepted,
+			State:   lablinkv4client.OrderStateTypeEntered,
 		}},
 	})
 	if err != nil {
