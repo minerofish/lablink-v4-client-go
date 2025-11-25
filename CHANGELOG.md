@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.2.0 (2025-11-25)
+
+Full Changelog: [v0.1.1...v0.2.0](https://github.com/minerofish/lablink-v4-client-go/compare/v0.1.1...v0.2.0)
+
+### Features
+
+* **api:** update via SDK Studio ([5de8865](https://github.com/minerofish/lablink-v4-client-go/commit/5de88651dcbd7b62a33ed564d0fb3acd0ae95171))
+* **api:** update via SDK Studio ([9984d08](https://github.com/minerofish/lablink-v4-client-go/commit/9984d081d7ca7195fae620d1e03979c3c3b19f12))
+* **api:** update via SDK Studio ([8014c01](https://github.com/minerofish/lablink-v4-client-go/commit/8014c0195b33ad92e29eeb597511712c43140b6c))
+* **api:** update via SDK Studio ([0a61ba6](https://github.com/minerofish/lablink-v4-client-go/commit/0a61ba680774e604122d1d9520343ce115517bfb))
+* **api:** update via SDK Studio ([8ae83fc](https://github.com/minerofish/lablink-v4-client-go/commit/8ae83fc78da9f7f452d19f8bb1baf2e969eb0adc))
+* New API version ([3427e92](https://github.com/minerofish/lablink-v4-client-go/commit/3427e92b0ebab58f9628080fd8443e5e55592877))
+* update API and Examples ([f1caaaa](https://github.com/minerofish/lablink-v4-client-go/commit/f1caaaaffd56e37736485c31ea0ffc1da69834cf))
+
+
+### Bug Fixes
+
+* **examples:** update for response format changes ([3cfbdad](https://github.com/minerofish/lablink-v4-client-go/commit/3cfbdad0a45bdb81332d9dca7c6e429ce247f864))
+
 ## 0.1.1 (2025-11-22)
 
 Full Changelog: [v0.1.0...v0.1.1](https://github.com/minerofish/lablink-v4-client-go/compare/v0.1.0...v0.1.1)
