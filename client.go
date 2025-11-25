@@ -18,8 +18,6 @@ import (
 type Client struct {
 	Options       []option.RequestOption
 	Bloodlab      BloodlabService
-	Cli           CliService
-	Documents     DocumentService
 	Procedures    ProcedureService
 	Examinations  ExaminationService
 	Laboratories  LaboratoryService
@@ -27,7 +25,6 @@ type Client struct {
 	Login         LoginService
 	Authorize     AuthorizeService
 	Token         TokenService
-	OrderStates   OrderStateService
 	Orders        OrderService
 	Organizations OrganizationService
 }
@@ -55,8 +52,6 @@ func NewClient(opts ...option.RequestOption) (r Client) {
 	r = Client{Options: opts}
 
 	r.Bloodlab = NewBloodlabService(opts...)
-	r.Cli = NewCliService(opts...)
-	r.Documents = NewDocumentService(opts...)
 	r.Procedures = NewProcedureService(opts...)
 	r.Examinations = NewExaminationService(opts...)
 	r.Laboratories = NewLaboratoryService(opts...)
@@ -64,7 +59,6 @@ func NewClient(opts ...option.RequestOption) (r Client) {
 	r.Login = NewLoginService(opts...)
 	r.Authorize = NewAuthorizeService(opts...)
 	r.Token = NewTokenService(opts...)
-	r.OrderStates = NewOrderStateService(opts...)
 	r.Orders = NewOrderService(opts...)
 	r.Organizations = NewOrganizationService(opts...)
 

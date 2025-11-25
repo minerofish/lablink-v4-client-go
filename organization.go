@@ -28,6 +28,7 @@ import (
 // the [NewOrganizationService] method instead.
 type OrganizationService struct {
 	Options []option.RequestOption
+	Query   OrganizationQueryService
 }
 
 // NewOrganizationService generates a new service that applies the given options to
@@ -36,6 +37,7 @@ type OrganizationService struct {
 func NewOrganizationService(opts ...option.RequestOption) (r OrganizationService) {
 	r = OrganizationService{}
 	r.Options = opts
+	r.Query = NewOrganizationQueryService(opts...)
 	return
 }
 

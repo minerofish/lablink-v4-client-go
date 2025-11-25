@@ -4,6 +4,7 @@ package lablinkv4client_test
 
 import (
 	"context"
+	"errors"
 	"os"
 	"testing"
 
@@ -12,7 +13,8 @@ import (
 	"github.com/minerofish/lablink-v4-client-go/option"
 )
 
-func TestUsage(t *testing.T) {
+func TestLaboratoryQueryExecuteWithOptionalParams(t *testing.T) {
+	t.Skip("Prism tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -24,9 +26,18 @@ func TestUsage(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	bloodlabOrganizationRelations, err := client.Bloodlab.ListExaminations(context.TODO())
+	_, err := client.Laboratories.Query.Execute(context.TODO(), lablinkv4client.LaboratoryQueryExecuteParams{
+		Page:          lablinkv4client.Int(0),
+		PageSize:      lablinkv4client.Int(1),
+		Sort:          []string{"name,asc"},
+		LaboratoryIDs: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
+		Name:          lablinkv4client.String("name"),
+	})
 	if err != nil {
+		var apierr *lablinkv4client.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
 		t.Fatalf("err should be nil: %s", err.Error())
 	}
-	t.Logf("%+v\n", bloodlabOrganizationRelations)
 }

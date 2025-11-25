@@ -13,7 +13,6 @@ import (
 	"net/http"
 	"net/url"
 	"slices"
-	"time"
 
 	"github.com/minerofish/lablink-v4-client-go/internal/apiform"
 	"github.com/minerofish/lablink-v4-client-go/internal/apijson"
@@ -23,6 +22,7 @@ import (
 	"github.com/minerofish/lablink-v4-client-go/option"
 	"github.com/minerofish/lablink-v4-client-go/packages/param"
 	"github.com/minerofish/lablink-v4-client-go/packages/respjson"
+	"github.com/minerofish/lablink-v4-client-go/shared"
 )
 
 // LaboratoryService contains methods and other services that help with interacting
@@ -35,6 +35,7 @@ type LaboratoryService struct {
 	Options   []option.RequestOption
 	Orders    LaboratoryOrderService
 	Contracts LaboratoryContractService
+	Query     LaboratoryQueryService
 }
 
 // NewLaboratoryService generates a new service that applies the given options to
@@ -45,6 +46,7 @@ func NewLaboratoryService(opts ...option.RequestOption) (r LaboratoryService) {
 	r.Options = opts
 	r.Orders = NewLaboratoryOrderService(opts...)
 	r.Contracts = NewLaboratoryContractService(opts...)
+	r.Query = NewLaboratoryQueryService(opts...)
 	return
 }
 
@@ -71,6 +73,19 @@ func (r *LaboratoryService) Delete(ctx context.Context, body LaboratoryDeletePar
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	path := "v4/laboratories"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, body, nil, opts...)
+	return
+}
+
+// Retrieves a list of contracts along with organizations and laboratories that
+// have contracts.
+func (r *LaboratoryService) QueryContracts(ctx context.Context, laboratoryID string, params LaboratoryQueryContractsParams, opts ...option.RequestOption) (res *LaboratoryQueryContractsResponse, err error) {
+	opts = slices.Concat(r.Options, opts)
+	if laboratoryID == "" {
+		err = errors.New("missing required laboratoryId parameter")
+		return
+	}
+	path := fmt.Sprintf("v4/laboratories/%s/contracts-query", laboratoryID)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, params, &res, opts...)
 	return
 }
 
@@ -187,6 +202,37 @@ func (r *LaboratoryNewResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type LaboratoryQueryContractsResponse struct {
+	// The actual page number
+	CurrentPage int64 `json:"currentPage"`
+	Items       any   `json:"items"`
+	// The number of items per page
+	PageSize int64 `json:"pageSize"`
+	// The total count of items
+	TotalCount int64 `json:"totalCount"`
+	// The total pages
+	TotalPages int64 `json:"totalPages"`
+	// The transaction identifier
+	TransactionID string `json:"transactionId" format:"uuid"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		CurrentPage   respjson.Field
+		Items         respjson.Field
+		PageSize      respjson.Field
+		TotalCount    respjson.Field
+		TotalPages    respjson.Field
+		TransactionID respjson.Field
+		ExtraFields   map[string]respjson.Field
+		raw           string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r LaboratoryQueryContractsResponse) RawJSON() string { return r.JSON.raw }
+func (r *LaboratoryQueryContractsResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type LaboratoryNewParams struct {
 	Body []LaboratoryNewParamsBody
 	paramObj
@@ -251,6 +297,35 @@ func (r LaboratoryDeleteParams) URLQuery() (v url.Values, err error) {
 	})
 }
 
+type LaboratoryQueryContractsParams struct {
+	Page     param.Opt[int64] `query:"Page,omitzero" json:"-"`
+	PageSize param.Opt[int64] `query:"PageSize,omitzero" json:"-"`
+	// The sorting parameters in the format of "fieldName,asc/desc". E.g. type,desc
+	//
+	// Any of "validFrom,asc", "validFrom,desc".
+	Sort []string `query:"sort,omitzero" json:"-"`
+	// Filter by Organization IDs
+	OrganizationIDs []string `json:"organizationIds,omitzero" format:"uuid"`
+	paramObj
+}
+
+func (r LaboratoryQueryContractsParams) MarshalJSON() (data []byte, err error) {
+	type shadow LaboratoryQueryContractsParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *LaboratoryQueryContractsParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// URLQuery serializes [LaboratoryQueryContractsParams]'s query parameters as
+// `url.Values`.
+func (r LaboratoryQueryContractsParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}
+
 type LaboratoryUploadDocumentParams struct {
 	// The file
 	File    io.Reader `json:"file,omitzero,required" format:"binary"`
@@ -289,7 +364,7 @@ const (
 
 type LaboratoryUploadResultsParams struct {
 	// Upload results in json format
-	Body []LaboratoryUploadResultsParamsBody
+	Body []shared.ResultParam
 	paramObj
 }
 
@@ -298,46 +373,4 @@ func (r LaboratoryUploadResultsParams) MarshalJSON() (data []byte, err error) {
 }
 func (r *LaboratoryUploadResultsParams) UnmarshalJSON(data []byte) error {
 	return json.Unmarshal(data, &r.Body)
-}
-
-// The properties ExaminationID, ItemID, OrderID, Result, Status are required.
-type LaboratoryUploadResultsParamsBody struct {
-	// The order-examination ID.
-	ExaminationID string `json:"examinationId,required" format:"uuid"`
-	// The order-examination item ID
-	ItemID string `json:"itemId,required" format:"uuid"`
-	// The order ID
-	OrderID string `json:"orderId,required" format:"uuid"`
-	Result  string `json:"result,required"`
-	// Any of "FINAL", "PRELIMINARY", "CORRECTED".
-	Status string `json:"status,omitzero,required"`
-	// Indicates if the result requires confirmation.
-	ConfirmationPending param.Opt[bool]      `json:"confirmationPending,omitzero"`
-	InfoText            param.Opt[string]    `json:"infoText,omitzero"`
-	PerformedAt         param.Opt[time.Time] `json:"performedAt,omitzero" format:"date-time"`
-	Unit                param.Opt[string]    `json:"unit,omitzero"`
-	ValidatedAt         param.Opt[time.Time] `json:"validatedAt,omitzero" format:"date-time"`
-	ValidatedBy         param.Opt[string]    `json:"validatedBy,omitzero"`
-	// The data type of the result
-	//
-	// Any of "int", "decimal", "string", "pein", "react", "invalid", "enum".
-	DataType string `json:"dataType,omitzero"`
-	paramObj
-}
-
-func (r LaboratoryUploadResultsParamsBody) MarshalJSON() (data []byte, err error) {
-	type shadow LaboratoryUploadResultsParamsBody
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *LaboratoryUploadResultsParamsBody) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func init() {
-	apijson.RegisterFieldValidator[LaboratoryUploadResultsParamsBody](
-		"status", "FINAL", "PRELIMINARY", "CORRECTED",
-	)
-	apijson.RegisterFieldValidator[LaboratoryUploadResultsParamsBody](
-		"dataType", "int", "decimal", "string", "pein", "react", "invalid", "enum",
-	)
 }

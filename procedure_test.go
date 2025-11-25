@@ -24,7 +24,6 @@ func TestProcedureNew(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Procedures.New(context.TODO(), lablinkv4client.ProcedureNewParams{
@@ -60,7 +59,6 @@ func TestProcedureUpdateWithOptionalParams(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Procedures.Update(
@@ -98,7 +96,6 @@ func TestProcedureListWithOptionalParams(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Procedures.List(context.TODO(), lablinkv4client.ProcedureListParams{
@@ -131,7 +128,6 @@ func TestProcedureDelete(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
 	err := client.Procedures.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")

@@ -169,14 +169,28 @@ func (r *ContractOrganization) UnmarshalJSON(data []byte) error {
 }
 
 type LaboratoryContractGetResponse struct {
-	Items []Contract `json:"items"`
+	// The actual page number
+	CurrentPage int64 `json:"currentPage"`
+	Items       any   `json:"items"`
+	// The number of items per page
+	PageSize int64 `json:"pageSize"`
+	// The total count of items
+	TotalCount int64 `json:"totalCount"`
+	// The total pages
+	TotalPages int64 `json:"totalPages"`
+	// The transaction identifier
+	TransactionID string `json:"transactionId" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Items       respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
+		CurrentPage   respjson.Field
+		Items         respjson.Field
+		PageSize      respjson.Field
+		TotalCount    respjson.Field
+		TotalPages    respjson.Field
+		TransactionID respjson.Field
+		ExtraFields   map[string]respjson.Field
+		raw           string
 	} `json:"-"`
-	Page
 }
 
 // Returns the unmodified JSON received from the API

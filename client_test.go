@@ -26,7 +26,6 @@ func (t *closureTransport) RoundTrip(req *http.Request) (*http.Response, error) 
 func TestUserAgentHeader(t *testing.T) {
 	var userAgent string
 	client := lablinkv4client.NewClient(
-		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 		option.WithHTTPClient(&http.Client{
 			Transport: &closureTransport{
@@ -48,7 +47,6 @@ func TestUserAgentHeader(t *testing.T) {
 func TestRetryAfter(t *testing.T) {
 	retryCountHeaders := make([]string, 0)
 	client := lablinkv4client.NewClient(
-		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 		option.WithHTTPClient(&http.Client{
 			Transport: &closureTransport{
@@ -83,7 +81,6 @@ func TestRetryAfter(t *testing.T) {
 func TestDeleteRetryCountHeader(t *testing.T) {
 	retryCountHeaders := make([]string, 0)
 	client := lablinkv4client.NewClient(
-		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 		option.WithHTTPClient(&http.Client{
 			Transport: &closureTransport{
@@ -114,7 +111,6 @@ func TestDeleteRetryCountHeader(t *testing.T) {
 func TestOverwriteRetryCountHeader(t *testing.T) {
 	retryCountHeaders := make([]string, 0)
 	client := lablinkv4client.NewClient(
-		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 		option.WithHTTPClient(&http.Client{
 			Transport: &closureTransport{
@@ -145,7 +141,6 @@ func TestOverwriteRetryCountHeader(t *testing.T) {
 func TestRetryAfterMs(t *testing.T) {
 	attempts := 0
 	client := lablinkv4client.NewClient(
-		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 		option.WithHTTPClient(&http.Client{
 			Transport: &closureTransport{
@@ -172,7 +167,6 @@ func TestRetryAfterMs(t *testing.T) {
 
 func TestContextCancel(t *testing.T) {
 	client := lablinkv4client.NewClient(
-		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 		option.WithHTTPClient(&http.Client{
 			Transport: &closureTransport{
@@ -193,7 +187,6 @@ func TestContextCancel(t *testing.T) {
 
 func TestContextCancelDelay(t *testing.T) {
 	client := lablinkv4client.NewClient(
-		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 		option.WithHTTPClient(&http.Client{
 			Transport: &closureTransport{
@@ -222,7 +215,6 @@ func TestContextDeadline(t *testing.T) {
 
 	go func() {
 		client := lablinkv4client.NewClient(
-			option.WithBearerToken("My Bearer Token"),
 			option.WithAPIKey("My API Key"),
 			option.WithHTTPClient(&http.Client{
 				Transport: &closureTransport{

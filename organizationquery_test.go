@@ -13,7 +13,7 @@ import (
 	"github.com/minerofish/lablink-v4-client-go/option"
 )
 
-func TestAuthorizeGetWithOptionalParams(t *testing.T) {
+func TestOrganizationQueryNewWithOptionalParams(t *testing.T) {
 	t.Skip("Prism tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -26,14 +26,14 @@ func TestAuthorizeGetWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Authorize.Get(context.TODO(), lablinkv4client.AuthorizeGetParams{
-		ClientID:            "client_id",
-		CodeChallenge:       "code_challenge",
-		CodeChallengeMethod: lablinkv4client.AuthorizeGetParamsCodeChallengeMethodS256,
-		RedirectUri:         "https://example.com",
-		ResponseType:        lablinkv4client.AuthorizeGetParamsResponseTypeCode,
-		Scope:               lablinkv4client.String("scope"),
-		State:               lablinkv4client.String("state"),
+	_, err := client.Organizations.Query.New(context.TODO(), lablinkv4client.OrganizationQueryNewParams{
+		Page:            lablinkv4client.Int(0),
+		PageSize:        lablinkv4client.Int(1),
+		Sort:            []string{"name,asc"},
+		Emails:          []string{"user@example.com"},
+		Name:            lablinkv4client.String("John Doe Clinic"),
+		OrganizationIDs: []string{"123e4567-e89b-12d3-a456-426614174000"},
+		Roles:           []lablinkv4client.OrganizationRole{lablinkv4client.OrganizationRoleOrganizationAdmin},
 	})
 	if err != nil {
 		var apierr *lablinkv4client.Error

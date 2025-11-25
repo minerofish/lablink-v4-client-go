@@ -1,3 +1,11 @@
+# Shared Params Types
+
+- <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go/shared#ResultParam">ResultParam</a>
+
+# Shared Response Types
+
+- <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go/shared#Result">Result</a>
+
 # Bloodlab
 
 Response Types:
@@ -20,14 +28,6 @@ Methods:
 - <code title="get /v4/bloodlab/orders">client.Bloodlab.Orders.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#BloodlabOrderService.ListNewOrders">ListNewOrders</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>) ([]<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#BloodlabOrderListNewOrdersResponse">BloodlabOrderListNewOrdersResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="post /v4/bloodlab/orders/downloaded">client.Bloodlab.Orders.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#BloodlabOrderService.MarkAsDownloaded">MarkAsDownloaded</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#BloodlabOrderMarkAsDownloadedParams">BloodlabOrderMarkAsDownloadedParams</a>) <a href="https://pkg.go.dev/builtin#error">error</a></code>
 - <code title="post /v4/bloodlab/orders/state">client.Bloodlab.Orders.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#BloodlabOrderService.SetState">SetState</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#BloodlabOrderSetStateParams">BloodlabOrderSetStateParams</a>) <a href="https://pkg.go.dev/builtin#error">error</a></code>
-
-# Cli
-
-# Documents
-
-Response Types:
-
-- <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#Page">Page</a>
 
 # Procedures
 
@@ -66,12 +66,14 @@ Response Types:
 - <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#Laboratory">Laboratory</a>
 - <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryUserRelations">LaboratoryUserRelations</a>
 - <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryNewResponse">LaboratoryNewResponse</a>
+- <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryQueryContractsResponse">LaboratoryQueryContractsResponse</a>
 
 Methods:
 
 - <code title="post /v4/laboratories">client.Laboratories.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryService.New">New</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryNewParams">LaboratoryNewParams</a>) ([]<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryNewResponse">LaboratoryNewResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="get /v4/laboratories">client.Laboratories.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryService.List">List</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, query <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryListParams">LaboratoryListParams</a>) ([]<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#Laboratory">Laboratory</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="delete /v4/laboratories">client.Laboratories.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryService.Delete">Delete</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryDeleteParams">LaboratoryDeleteParams</a>) <a href="https://pkg.go.dev/builtin#error">error</a></code>
+- <code title="post /v4/laboratories/{laboratoryId}/contracts-query">client.Laboratories.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryService.QueryContracts">QueryContracts</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, laboratoryID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryQueryContractsParams">LaboratoryQueryContractsParams</a>) (<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryQueryContractsResponse">LaboratoryQueryContractsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="post /v4/laboratories/{laboratoryId}/document">client.Laboratories.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryService.UploadDocument">UploadDocument</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, laboratoryID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryUploadDocumentParams">LaboratoryUploadDocumentParams</a>) <a href="https://pkg.go.dev/builtin#error">error</a></code>
 - <code title="post /v4/laboratories/{laboratoryId}/results">client.Laboratories.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryService.UploadResults">UploadResults</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, laboratoryID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryUploadResultsParams">LaboratoryUploadResultsParams</a>) <a href="https://pkg.go.dev/builtin#error">error</a></code>
 
@@ -79,7 +81,6 @@ Methods:
 
 Response Types:
 
-- <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#Order">Order</a>
 - <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryOrderListResponse">LaboratoryOrderListResponse</a>
 
 Methods:
@@ -100,6 +101,16 @@ Methods:
 - <code title="get /v4/laboratories/{laboratoryId}/contracts">client.Laboratories.Contracts.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryContractService.Get">Get</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, laboratoryID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryContractGetParams">LaboratoryContractGetParams</a>) (<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryContractGetResponse">LaboratoryContractGetResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="patch /v4/laboratories/{laboratoryId}/contracts">client.Laboratories.Contracts.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryContractService.Update">Update</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, laboratoryID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryContractUpdateParams">LaboratoryContractUpdateParams</a>) <a href="https://pkg.go.dev/builtin#error">error</a></code>
 - <code title="delete /v4/laboratories/{laboratoryId}/contracts">client.Laboratories.Contracts.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryContractService.Delete">Delete</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, laboratoryID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryContractDeleteParams">LaboratoryContractDeleteParams</a>) <a href="https://pkg.go.dev/builtin#error">error</a></code>
+
+## Query
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryQueryExecuteResponse">LaboratoryQueryExecuteResponse</a>
+
+Methods:
+
+- <code title="post /v4/laboratories-query">client.Laboratories.Query.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryQueryService.Execute">Execute</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, params <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryQueryExecuteParams">LaboratoryQueryExecuteParams</a>) (<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#LaboratoryQueryExecuteResponse">LaboratoryQueryExecuteResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 # Locations
 
@@ -135,8 +146,6 @@ Methods:
 Methods:
 
 - <code title="post /v4/token">client.Token.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#TokenService.New">New</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#TokenNewParams">TokenNewParams</a>) (<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#AuthToken">AuthToken</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-
-# OrderStates
 
 # Orders
 
@@ -176,6 +185,7 @@ Methods:
 - <code title="get /v4/orders/{orderId}">client.Orders.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrderService.Get">Get</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, orderID <a href="https://pkg.go.dev/builtin#string">string</a>) (<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrderGetResponse">OrderGetResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="delete /v4/orders">client.Orders.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrderService.Delete">Delete</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrderDeleteParams">OrderDeleteParams</a>) <a href="https://pkg.go.dev/builtin#error">error</a></code>
 - <code title="delete /v4/orders/{orderId}">client.Orders.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrderService.DeleteOrder">DeleteOrder</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, orderID <a href="https://pkg.go.dev/builtin#string">string</a>) <a href="https://pkg.go.dev/builtin#error">error</a></code>
+- <code title="get /v4/orders/{orderId}/documents/{documentId}">client.Orders.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrderService.GetDocument">GetDocument</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, documentID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrderGetDocumentParams">OrderGetDocumentParams</a>) (http.Response, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 ## Tags
 
@@ -197,6 +207,17 @@ Methods:
 - <code title="post /v4/orders/{orderId}/examinations">client.Orders.Examinations.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrderExaminationService.Add">Add</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, orderID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrderExaminationAddParams">OrderExaminationAddParams</a>) ([]<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrderExaminationAddResponse">OrderExaminationAddResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="delete /v4/orders/{orderId}/examinations">client.Orders.Examinations.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrderExaminationService.Remove">Remove</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, orderID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrderExaminationRemoveParams">OrderExaminationRemoveParams</a>) <a href="https://pkg.go.dev/builtin#error">error</a></code>
 
+## Query
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrderQueryNewResponse">OrderQueryNewResponse</a>
+
+Methods:
+
+- <code title="post /v4/orders-query">client.Orders.Query.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrderQueryService.New">New</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, params <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrderQueryNewParams">OrderQueryNewParams</a>) (<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrderQueryNewResponse">OrderQueryNewResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="patch /v4/orders-query/{transactionId}">client.Orders.Query.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrderQueryService.CommitTransaction">CommitTransaction</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, transactionID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrderQueryCommitTransactionParams">OrderQueryCommitTransactionParams</a>) ([]<a href="https://pkg.go.dev/builtin#string">string</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
 # Organizations
 
 Params Types:
@@ -212,3 +233,13 @@ Methods:
 - <code title="post /v4/organizations">client.Organizations.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrganizationService.New">New</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrganizationNewParams">OrganizationNewParams</a>) ([]<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#Organization">Organization</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="patch /v4/organizations/{organizationId}">client.Organizations.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrganizationService.Update">Update</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, organizationID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrganizationUpdateParams">OrganizationUpdateParams</a>) (<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#Organization">Organization</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="get /v4/organizations">client.Organizations.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrganizationService.List">List</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, query <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrganizationListParams">OrganizationListParams</a>) ([]<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#Organization">Organization</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
+## Query
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrganizationQueryNewResponse">OrganizationQueryNewResponse</a>
+
+Methods:
+
+- <code title="post /v4/organizations-query">client.Organizations.Query.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrganizationQueryService.New">New</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, params <a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrganizationQueryNewParams">OrganizationQueryNewParams</a>) (<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go">lablinkv4client</a>.<a href="https://pkg.go.dev/github.com/minerofish/lablink-v4-client-go#OrganizationQueryNewResponse">OrganizationQueryNewResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>

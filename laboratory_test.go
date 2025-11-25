@@ -14,6 +14,7 @@ import (
 	"github.com/minerofish/lablink-v4-client-go"
 	"github.com/minerofish/lablink-v4-client-go/internal/testutil"
 	"github.com/minerofish/lablink-v4-client-go/option"
+	"github.com/minerofish/lablink-v4-client-go/shared"
 )
 
 func TestLaboratoryNew(t *testing.T) {
@@ -27,7 +28,6 @@ func TestLaboratoryNew(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Laboratories.New(context.TODO(), lablinkv4client.LaboratoryNewParams{
@@ -62,7 +62,6 @@ func TestLaboratoryListWithOptionalParams(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Laboratories.List(context.TODO(), lablinkv4client.LaboratoryListParams{
@@ -88,12 +87,43 @@ func TestLaboratoryDelete(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
 	err := client.Laboratories.Delete(context.TODO(), lablinkv4client.LaboratoryDeleteParams{
 		LaboratoryID: "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 	})
+	if err != nil {
+		var apierr *lablinkv4client.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestLaboratoryQueryContractsWithOptionalParams(t *testing.T) {
+	t.Skip("Prism tests are disabled")
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := lablinkv4client.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	_, err := client.Laboratories.QueryContracts(
+		context.TODO(),
+		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		lablinkv4client.LaboratoryQueryContractsParams{
+			Page:            lablinkv4client.Int(0),
+			PageSize:        lablinkv4client.Int(1),
+			Sort:            []string{"validFrom,asc"},
+			OrganizationIDs: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
+		},
+	)
 	if err != nil {
 		var apierr *lablinkv4client.Error
 		if errors.As(err, &apierr) {
@@ -114,7 +144,6 @@ func TestLaboratoryUploadDocument(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
 	err := client.Laboratories.UploadDocument(
@@ -146,21 +175,20 @@ func TestLaboratoryUploadResults(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
 	err := client.Laboratories.UploadResults(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		lablinkv4client.LaboratoryUploadResultsParams{
-			Body: []lablinkv4client.LaboratoryUploadResultsParamsBody{{
+			Body: []shared.ResultParam{{
 				ExaminationID:       "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 				ItemID:              "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 				OrderID:             "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 				Result:              "result",
-				Status:              "FINAL",
+				Status:              shared.ResultStatusFinal,
 				ConfirmationPending: lablinkv4client.Bool(true),
-				DataType:            "int",
+				DataType:            shared.ResultDataTypeInt,
 				InfoText:            lablinkv4client.String("infoText"),
 				PerformedAt:         lablinkv4client.Time(time.Now()),
 				Unit:                lablinkv4client.String("unit"),

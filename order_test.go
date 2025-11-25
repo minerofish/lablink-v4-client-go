@@ -3,8 +3,12 @@
 package lablinkv4client_test
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"testing"
 	"time"
@@ -25,7 +29,6 @@ func TestOrderNewWithOptionalParams(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Orders.New(context.TODO(), lablinkv4client.OrderNewParams{
@@ -100,7 +103,6 @@ func TestOrderGet(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Orders.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
@@ -124,7 +126,6 @@ func TestOrderDelete(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
 	err := client.Orders.Delete(context.TODO(), lablinkv4client.OrderDeleteParams{
@@ -150,7 +151,6 @@ func TestOrderDeleteOrder(t *testing.T) {
 	}
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
 		option.WithAPIKey("My API Key"),
 	)
 	err := client.Orders.DeleteOrder(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
@@ -160,5 +160,45 @@ func TestOrderDeleteOrder(t *testing.T) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
 		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestOrderGetDocument(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		w.Write([]byte("abc"))
+	}))
+	defer server.Close()
+	baseURL := server.URL
+	client := lablinkv4client.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	resp, err := client.Orders.GetDocument(
+		context.TODO(),
+		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		lablinkv4client.OrderGetDocumentParams{
+			OrderID: "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		},
+	)
+	if err != nil {
+		var apierr *lablinkv4client.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+	defer resp.Body.Close()
+
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		var apierr *lablinkv4client.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+	if !bytes.Equal(b, []byte("abc")) {
+		t.Fatalf("return value not %s: %s", "abc", b)
 	}
 }

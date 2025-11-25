@@ -19,6 +19,7 @@ import (
 	"github.com/minerofish/lablink-v4-client-go/option"
 	"github.com/minerofish/lablink-v4-client-go/packages/param"
 	"github.com/minerofish/lablink-v4-client-go/packages/respjson"
+	"github.com/minerofish/lablink-v4-client-go/shared"
 )
 
 // OrderService contains methods and other services that help with interacting with
@@ -31,6 +32,7 @@ type OrderService struct {
 	Options      []option.RequestOption
 	Tags         OrderTagService
 	Examinations OrderExaminationService
+	Query        OrderQueryService
 }
 
 // NewOrderService generates a new service that applies the given options to each
@@ -41,6 +43,7 @@ func NewOrderService(opts ...option.RequestOption) (r OrderService) {
 	r.Options = opts
 	r.Tags = NewOrderTagService(opts...)
 	r.Examinations = NewOrderExaminationService(opts...)
+	r.Query = NewOrderQueryService(opts...)
 	return
 }
 
@@ -84,6 +87,23 @@ func (r *OrderService) DeleteOrder(ctx context.Context, orderID string, opts ...
 	}
 	path := fmt.Sprintf("v4/orders/%s", orderID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
+	return
+}
+
+// Gets a document of the authenticated user.
+func (r *OrderService) GetDocument(ctx context.Context, documentID string, query OrderGetDocumentParams, opts ...option.RequestOption) (res *http.Response, err error) {
+	opts = slices.Concat(r.Options, opts)
+	opts = append([]option.RequestOption{option.WithHeader("Accept", "application/pdf")}, opts...)
+	if query.OrderID == "" {
+		err = errors.New("missing required orderId parameter")
+		return
+	}
+	if documentID == "" {
+		err = errors.New("missing required documentId parameter")
+		return
+	}
+	path := fmt.Sprintf("v4/orders/%s/documents/%s", query.OrderID, documentID)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
 }
 
@@ -285,7 +305,7 @@ type OrderExamination struct {
 	// The external unique identifier of the order
 	Reference string `json:"reference"`
 	// The result belonging to the order
-	Result OrderExaminationResult `json:"result"`
+	Result shared.Result `json:"result"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		CollectionTime  respjson.Field
@@ -303,53 +323,6 @@ type OrderExamination struct {
 // Returns the unmodified JSON received from the API
 func (r OrderExamination) RawJSON() string { return r.JSON.raw }
 func (r *OrderExamination) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// The result belonging to the order
-type OrderExaminationResult struct {
-	// The order-examination ID.
-	ExaminationID string `json:"examinationId,required" format:"uuid"`
-	// The order-examination item ID
-	ItemID string `json:"itemId,required" format:"uuid"`
-	// The order ID
-	OrderID string `json:"orderId,required" format:"uuid"`
-	Result  string `json:"result,required"`
-	// Any of "FINAL", "PRELIMINARY", "CORRECTED".
-	Status string `json:"status,required"`
-	// Indicates if the result requires confirmation.
-	ConfirmationPending bool `json:"confirmationPending"`
-	// The data type of the result
-	//
-	// Any of "int", "decimal", "string", "pein", "react", "invalid", "enum".
-	DataType    string    `json:"dataType"`
-	InfoText    string    `json:"infoText"`
-	PerformedAt time.Time `json:"performedAt" format:"date-time"`
-	Unit        string    `json:"unit"`
-	ValidatedAt time.Time `json:"validatedAt" format:"date-time"`
-	ValidatedBy string    `json:"validatedBy"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ExaminationID       respjson.Field
-		ItemID              respjson.Field
-		OrderID             respjson.Field
-		Result              respjson.Field
-		Status              respjson.Field
-		ConfirmationPending respjson.Field
-		DataType            respjson.Field
-		InfoText            respjson.Field
-		PerformedAt         respjson.Field
-		Unit                respjson.Field
-		ValidatedAt         respjson.Field
-		ValidatedBy         respjson.Field
-		ExtraFields         map[string]respjson.Field
-		raw                 string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r OrderExaminationResult) RawJSON() string { return r.JSON.raw }
-func (r *OrderExaminationResult) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -713,4 +686,9 @@ func (r OrderDeleteParams) URLQuery() (v url.Values, err error) {
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
+}
+
+type OrderGetDocumentParams struct {
+	OrderID string `path:"orderId,required" format:"uuid" json:"-"`
+	paramObj
 }

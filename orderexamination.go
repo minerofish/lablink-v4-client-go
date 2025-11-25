@@ -19,6 +19,7 @@ import (
 	"github.com/minerofish/lablink-v4-client-go/option"
 	"github.com/minerofish/lablink-v4-client-go/packages/param"
 	"github.com/minerofish/lablink-v4-client-go/packages/respjson"
+	"github.com/minerofish/lablink-v4-client-go/shared"
 )
 
 // OrderExaminationService contains methods and other services that help with
@@ -96,7 +97,7 @@ type OrderExaminationListResponse struct {
 	// The unit of the organization examination
 	Unit string `json:"unit,required"`
 	// The result if available
-	Result OrderExaminationListResponseResult `json:"result"`
+	Result shared.Result `json:"result"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Code           respjson.Field
@@ -119,53 +120,6 @@ func (r *OrderExaminationListResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// The result if available
-type OrderExaminationListResponseResult struct {
-	// The order-examination ID.
-	ExaminationID string `json:"examinationId,required" format:"uuid"`
-	// The order-examination item ID
-	ItemID string `json:"itemId,required" format:"uuid"`
-	// The order ID
-	OrderID string `json:"orderId,required" format:"uuid"`
-	Result  string `json:"result,required"`
-	// Any of "FINAL", "PRELIMINARY", "CORRECTED".
-	Status string `json:"status,required"`
-	// Indicates if the result requires confirmation.
-	ConfirmationPending bool `json:"confirmationPending"`
-	// The data type of the result
-	//
-	// Any of "int", "decimal", "string", "pein", "react", "invalid", "enum".
-	DataType    string    `json:"dataType"`
-	InfoText    string    `json:"infoText"`
-	PerformedAt time.Time `json:"performedAt" format:"date-time"`
-	Unit        string    `json:"unit"`
-	ValidatedAt time.Time `json:"validatedAt" format:"date-time"`
-	ValidatedBy string    `json:"validatedBy"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ExaminationID       respjson.Field
-		ItemID              respjson.Field
-		OrderID             respjson.Field
-		Result              respjson.Field
-		Status              respjson.Field
-		ConfirmationPending respjson.Field
-		DataType            respjson.Field
-		InfoText            respjson.Field
-		PerformedAt         respjson.Field
-		Unit                respjson.Field
-		ValidatedAt         respjson.Field
-		ValidatedBy         respjson.Field
-		ExtraFields         map[string]respjson.Field
-		raw                 string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r OrderExaminationListResponseResult) RawJSON() string { return r.JSON.raw }
-func (r *OrderExaminationListResponseResult) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
 type OrderExaminationAddResponse struct {
 	// Reference to Order Item.
 	ID string `json:"id,required" format:"uuid"`
@@ -178,7 +132,7 @@ type OrderExaminationAddResponse struct {
 	// The name of the organization examination
 	Name string `json:"name,required"`
 	// The results belonging to the order
-	Results []OrderExaminationAddResponseResult `json:"results,required"`
+	Results []shared.Result `json:"results,required"`
 	// The sample codes
 	SampleCode string `json:"sampleCode,required"`
 	// The unit of the organization examination
@@ -204,52 +158,6 @@ type OrderExaminationAddResponse struct {
 // Returns the unmodified JSON received from the API
 func (r OrderExaminationAddResponse) RawJSON() string { return r.JSON.raw }
 func (r *OrderExaminationAddResponse) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type OrderExaminationAddResponseResult struct {
-	// The order-examination ID.
-	ExaminationID string `json:"examinationId,required" format:"uuid"`
-	// The order-examination item ID
-	ItemID string `json:"itemId,required" format:"uuid"`
-	// The order ID
-	OrderID string `json:"orderId,required" format:"uuid"`
-	Result  string `json:"result,required"`
-	// Any of "FINAL", "PRELIMINARY", "CORRECTED".
-	Status string `json:"status,required"`
-	// Indicates if the result requires confirmation.
-	ConfirmationPending bool `json:"confirmationPending"`
-	// The data type of the result
-	//
-	// Any of "int", "decimal", "string", "pein", "react", "invalid", "enum".
-	DataType    string    `json:"dataType"`
-	InfoText    string    `json:"infoText"`
-	PerformedAt time.Time `json:"performedAt" format:"date-time"`
-	Unit        string    `json:"unit"`
-	ValidatedAt time.Time `json:"validatedAt" format:"date-time"`
-	ValidatedBy string    `json:"validatedBy"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ExaminationID       respjson.Field
-		ItemID              respjson.Field
-		OrderID             respjson.Field
-		Result              respjson.Field
-		Status              respjson.Field
-		ConfirmationPending respjson.Field
-		DataType            respjson.Field
-		InfoText            respjson.Field
-		PerformedAt         respjson.Field
-		Unit                respjson.Field
-		ValidatedAt         respjson.Field
-		ValidatedBy         respjson.Field
-		ExtraFields         map[string]respjson.Field
-		raw                 string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r OrderExaminationAddResponseResult) RawJSON() string { return r.JSON.raw }
-func (r *OrderExaminationAddResponseResult) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
