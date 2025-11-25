@@ -45,8 +45,8 @@ func (r *LaboratoryQueryService) Execute(ctx context.Context, params LaboratoryQ
 
 type LaboratoryQueryExecuteResponse struct {
 	// The actual page number
-	CurrentPage int64 `json:"currentPage"`
-	Items       any   `json:"items"`
+	CurrentPage int64                                `json:"currentPage"`
+	Items       []LaboratoryQueryExecuteResponseItem `json:"items"`
 	// The number of items per page
 	PageSize int64 `json:"pageSize"`
 	// The total count of items
@@ -71,6 +71,42 @@ type LaboratoryQueryExecuteResponse struct {
 // Returns the unmodified JSON received from the API
 func (r LaboratoryQueryExecuteResponse) RawJSON() string { return r.JSON.raw }
 func (r *LaboratoryQueryExecuteResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type LaboratoryQueryExecuteResponseItem struct {
+	ID           string                    `json:"id" format:"uuid"`
+	Address      string                    `json:"address"`
+	City         string                    `json:"city"`
+	Country      string                    `json:"country"`
+	CreatedBy    string                    `json:"createdBy"`
+	Email        string                    `json:"email"`
+	InstanceName string                    `json:"instanceName"`
+	Name         string                    `json:"name"`
+	Phone        string                    `json:"phone"`
+	Postcode     string                    `json:"postcode"`
+	UserRoles    []LaboratoryUserRelations `json:"userRoles"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID           respjson.Field
+		Address      respjson.Field
+		City         respjson.Field
+		Country      respjson.Field
+		CreatedBy    respjson.Field
+		Email        respjson.Field
+		InstanceName respjson.Field
+		Name         respjson.Field
+		Phone        respjson.Field
+		Postcode     respjson.Field
+		UserRoles    respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r LaboratoryQueryExecuteResponseItem) RawJSON() string { return r.JSON.raw }
+func (r *LaboratoryQueryExecuteResponseItem) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
