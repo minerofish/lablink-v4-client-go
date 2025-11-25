@@ -28,7 +28,8 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewLaboratoryContractService] method instead.
 type LaboratoryContractService struct {
-	Options []option.RequestOption
+	Options      []option.RequestOption
+	Examinations LaboratoryContractExaminationService
 }
 
 // NewLaboratoryContractService generates a new service that applies the given
@@ -37,6 +38,7 @@ type LaboratoryContractService struct {
 func NewLaboratoryContractService(opts ...option.RequestOption) (r LaboratoryContractService) {
 	r = LaboratoryContractService{}
 	r.Options = opts
+	r.Examinations = NewLaboratoryContractExaminationService(opts...)
 	return
 }
 
