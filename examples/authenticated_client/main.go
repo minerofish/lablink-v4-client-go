@@ -77,7 +77,7 @@ func testWithAuthenticatedClient(baseURL, username, password string) {
 		return
 	}
 
-	for i, examination := range *response2 {
+	for i, examination := range response2.Items {
 		fmt.Printf("%d: %+v\n", i, examination)
 	}
 }

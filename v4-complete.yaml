@@ -1,0 +1,5002 @@
+openapi: 3.0.3
+info:
+  description: Lablink is the official DRK Blutspende API for Laboratory integration
+  title: Lablink 4 API
+  contact:
+    name: DRK Blutspendedienst Baden-Wuerttemberg Hessen
+    url: https://blutspende.de
+    email: helpdesk@blutspende.de
+  license:
+    name: Commercial license
+    url: https://blutspende.org
+  version: "4.0"
+servers:
+  - url: https://lablink.blutspende.org
+tags:
+  - name: Auth
+    description: |
+      Authentication endpoints for managing user access and security.
+  - name: Organizations
+    description: |
+      Organizations represent entities that manage locations and are involved in laboratory processes. Every
+      Customer Login will be bound to one or more organizations. The organization account is created through
+      an invitation of a laboratory.
+  - name: Locations
+    description: |
+      Locations are rquired to identify the sender of material to a laboratory. Locations
+      are managed by the organization.
+  - name: Examination
+    description: |
+      Examinations are procedures offered by a laboratory through a contract and
+      can be used in an order.
+  - name: Laboratory
+    description: |
+      These Enpoints are used by bloodlab's laboratory instances to communicate
+      with the Lablink API.
+  - name: Procedures
+    description: |
+      Procedures describe single or multiple laboratory-tests performed
+      in a certain manner. Procedures can not be ordered directly, they must
+      be offered by a laboratory through a contract.
+  - name: Bloodlab integration
+    description: |
+      These Endpoints are deprecated and will be removed shortly.
+paths:
+  /v4/bloodlab/examinations:
+    get:
+      security:
+        - BearerAuth: []
+      description:
+        Lablink-client uses this to get all examinations for making the
+        Lablink catalog
+        This function is redundant to the api get examinations and should be eliminated in the future
+      tags:
+        - Bloodlab integration
+      summary: Get all examinations available for mapping to Bloodlab
+      operationId: GetBloodlabExaminations
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BloodlabOrganizationRelation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /v4/bloodlab/orders:
+    get:
+      security:
+        - BearerAuth: []
+      description: Gets all order which are not downloaded yet.
+      tags:
+        - Bloodlab integration
+      summary: Get new orders
+      operationId: GetOrdersForBloodlab
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BloodlabOrder"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /v4/bloodlab/orders/downloaded:
+    post:
+      security:
+        - BearerAuth: []
+      description: Mark orders as downloaded.
+      tags:
+        - Bloodlab integration
+      summary: Mark orders as downloaded
+      operationId: SetDownloadedBloodlabOrders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+        description: The order IDs which are marked as downloaded
+        required: true
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /v4/bloodlab/orders/state:
+    post:
+      security:
+        - BearerAuth: []
+      description: Set orders state. (unruly)
+      tags:
+        - Bloodlab integration
+      summary: Set orders state
+      operationId: SetOrdersState
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/OrderStateChange"
+        description: The order state changes
+        required: true
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /v4/bloodlab/organization-relations:
+    get:
+      security:
+        - BearerAuth: []
+      description: Gets all organizations' relations including locations and examinations.
+      tags:
+        - Bloodlab integration
+      summary: Get organization relations
+      operationId: GetOrganizationRelationsForBloodlab
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BloodlabOrganizationRelation"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /v4/orders/{orderId}/documents/{documentId}:
+    get:
+      security:
+        - BearerAuth: []
+      description: Gets a document of the authenticated user.
+      tags:
+        - Order
+      summary: Get document
+      operationId: GetDocument
+      parameters:
+        - description: The order ID
+          name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - description: The document ID
+          name: documentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Bad Request
+          content:
+            application/pdf:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/pdf:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/pdf:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: Not Found
+          content:
+            application/pdf:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/pdf:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal server error
+          content:
+            application/pdf:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /v4/procedures:
+    get:
+      security:
+        - BearerAuth: []
+      description:
+        Procedures can be single or multiple laboratory-tests performed in a certain manner. Procecdures
+        can be seen as a global catalog of all valid examination procedures offered by laboratories.
+      tags:
+        - Procedures
+      summary: Get all procedures available for mapping to Bloodlab
+      operationId: GetProcedures
+      parameters:
+        - name: page
+          description: Page number
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: pageSize
+          description: Number of items per page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 25
+        - name: sort
+          description:
+            The sorting parameters in the format of "fieldName,asc/desc". E.g.
+            type,desc
+          in: query
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - "code,asc"
+                - "code,desc"
+                - "name,asc"
+                - "name,desc"
+                - "unit,asc"
+                - "unit,desc"
+        - name: codes
+          description: The code filter. Multiple codes can be provided. For querying a particular codesystem use codeSystem parameter.
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - name: codeSystem
+          description: The code system filter. Use one of loinc, snomed, abo_phenotype, p_group, g_group
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/CodingSystem"
+        - name: name
+          description: Filter by name. This search is executed as a case-insensitive partial match.
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: unit
+          description: Filter for unit. This search is executed as a case-insensitive partial match.
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: dataType
+          description: Filter for data type. This search is executed as a case-insensitive partial match.
+          required: false
+          in: query
+          schema:
+            $ref: "#/components/schemas/DataType"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProcedureResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    post:
+      summary: Create a new procedure
+      description: Creates a new procedure in the global catalog.
+      operationId: CreateProcedures
+      tags:
+        - Procedures
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                required:
+                  - name
+                properties:
+                  code:
+                    description: A default code suggested for simple reference. This is not a Primary key and may not be unique
+                    type: string
+                  name:
+                    description: A distinct and name of the offered procedure
+                    type: string
+                  description:
+                    description: The description of the procedure
+                    type: string
+                  unit:
+                    description: The unit
+                    type: string
+                  dataType:
+                    $ref: "#/components/schemas/DataType"
+                  codeSystems:
+                    description: The coding systems used for the procedure
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        codingSystem:
+                          $ref: "#/components/schemas/CodingSystem"
+                        code:
+                          description: The code within the system. Refer to the respective coding szstem for details
+                          type: string
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProcedureResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  "/v4/procedures/{procedureId}":
+    patch:
+      summary: Update procedure
+      description: Updates an existing procedure in the global catalog.
+      operationId: PatchProcedure
+      security:
+        - BearerAuth: []
+      tags:
+        - Procedures
+      parameters:
+        - name: procedureId
+          in: path
+          required: true
+          description: The procedure ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                name:
+                  type: string
+                description:
+                  type: string
+                unit:
+                  type: string
+                dataType:
+                  $ref: "#/components/schemas/DataType"
+                codeSystems:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      codingSystem:
+                        $ref: "#/components/schemas/CodingSystem"
+                      code:
+                        type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Procedure"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    delete:
+      summary: Remove procedure
+      description: Deletes a procedure from the global catalog.
+      operationId: DeleteProcedure
+      security:
+        - BearerAuth: []
+      tags:
+        - Procedures
+      parameters:
+        - name: procedureId
+          in: path
+          required: true
+          description: Identifier of the procedure
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /v4/examinations:
+    get:
+      security:
+        - BearerAuth: []
+      description: Gets all examination of the authenticated user.
+      tags:
+        - Examination
+      summary: Get examinations
+      operationId: GetExaminations
+      parameters:
+        - name: page
+          description: The desired page number
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: pageSize
+          description: The desired number of items per page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 25
+        - name: sort
+          description:
+            The sorting parameters in the format of "fieldName,asc/desc". E.g.
+            type,desc
+          in: query
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - "code,asc"
+                - "code,desc"
+                - "name,asc"
+                - "name,desc"
+                - "unit,asc"
+                - "unit,desc"
+        - name: code
+          description: The code filter
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: name
+          description: The name filter
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: unit
+          description: The unit filter
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: laboratoryID
+          description: The laboratory ID filter
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: organizationID
+          description: The organization ID filter
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Page"
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Examination"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /v4/laboratories-query:
+    post:
+      summary: Query laboratories
+      description: |
+        Queries laboratories. The caller must be user for the respective laboratories.
+      security:
+        - BearerAuth: []
+      tags:
+        - Laboratory
+      operationId: QueryLaboratories
+      parameters:
+        - name: page
+          description: Page number
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: pageSize
+          description: Number of items per page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: sort
+          description:
+            The sorting parameters in the format of "fieldName,asc/desc". E.g.
+            state,desc
+          in: query
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - "name,asc"
+                - "name,desc"
+                - "createdAt,asc"
+                - "createdAt,desc"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                laboratoryIDs:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Page"
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/LaboratoryResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /v4/laboratories:
+    get:
+      security:
+        - BearerAuth: []
+      description: |
+        Gets a laboratory by its id.
+      tags:
+        - Laboratory
+      summary: Get one laboratory by its id
+      operationId: GetLaboratory
+      parameters:
+        - name: laboratoryId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/LaboratoryResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    post:
+      summary: Create laboratories
+      description: Creates new laboratories for the authenticated user.
+      operationId: CreateLaboratories
+      tags:
+        - Laboratory
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                description: Request body for creating a new laboratory
+                type: object
+                required:
+                  - instance_name
+                  - name
+                properties:
+                  name:
+                    description: Name of the laboratory
+                    type: string
+                    example: Central Lab
+                  instance_name:
+                    type: string
+                    description: Bloodlab's laboratory instance name
+                    example: central-lab-instance
+                  address:
+                    type: string
+                    example: 123 Lab St, Lab City
+                  city:
+                    type: string
+                    example: Lab City
+                  country:
+                    type: string
+                    example: Labland
+                  email:
+                    type: string
+                    example: lab@labland.com
+                  phone:
+                    type: string
+                    example: "+1234567890"
+                  postcode:
+                    type: string
+                    example: "12345"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LaboratoryShortInfo"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    delete:
+      summary: Delete laboratory
+      description: |
+        Deletes a laboratory for the authenticated user.
+        User must have the laboratory_admin role to delete.
+        This operation is audited.
+      operationId: DeleteLaboratory
+      security:
+        - BearerAuth: []
+      tags:
+        - Laboratory
+      parameters:
+        - name: laboratoryID
+          description: The laboratory ID
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  "/v4/laboratories/{laboratoryId}/document":
+    post:
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      description: Upload documents for an order
+      tags:
+        - Laboratory
+      summary: Upload PDF document
+      operationId: UploadDocument
+      parameters:
+        - name: laboratoryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  description: The file
+                  type: string
+                  format: binary
+                orderId:
+                  type: string
+                  format: uuid
+                type:
+                  description: The document type
+                  $ref: "#/components/schemas/DocumentType"
+                  default: LAB_REPORT
+              required:
+                - file
+                - orderId
+                - type
+        required: true
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  "/v4/laboratories/{laboratoryId}/orders":
+    get:
+      summary: Get Orders
+      description: |
+        Downloads orders for a laboratory with pagination. With the download there is a job-tag received.
+      operationId: GetLaboratoriesOrders
+      tags:
+        - Laboratory
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      parameters:
+        - name: laboratoryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          description: Page number
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: pageSize
+          description: Number of items per page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: since
+          description: Only orders updated since this timestamp are returned
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: List orders
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Page"
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Order"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    patch:
+      summary: Update Orders
+      description: Update the status of orders to PROCESSING or DOWNLOADED
+      tags:
+        - Laboratory
+      operationId: PatchLaboratoryOrders
+      security:
+        - BearerAuth: []
+      parameters:
+        - description: Laboratory ID
+          name: laboratoryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchLegacyOrdersRequest"
+        description: Order state update request
+        required: true
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  "/v4/laboratories/{laboratoryId}/results":
+    post:
+      summary: Upload results from a laboratory.
+      description: Upload laboratory results from various cusotm systems
+      operationId: UploadResults
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      tags:
+        - Laboratory
+      parameters:
+        - name: laboratoryId
+          in: path
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        content:
+          text/plain+glims:
+            schema:
+              description: Upload Glims files in plain text format
+              type: array
+              items:
+                type: string
+          text/plain+exlab:
+            schema:
+              description: Upload Exlab files in plain text format
+              type: array
+              items:
+                type: string
+          application/json:
+            schema:
+              description: Upload results in json format
+              type: array
+              minItems: 1
+              maxItems: 2500
+              items:
+                $ref: "#/components/schemas/Result"
+        description: Array of Glims results
+        required: true
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  "/v4/laboratories/{laboratoryId}/contracts":
+    get:
+      summary: Get a contracts by a laboratory and/or organization
+      description: Retreieves a contract by laboratory and or organization
+      operationId: GetContracts
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      tags:
+        - Laboratory
+      parameters:
+        - name: laboratoryId
+          in: path
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - name: organizationid
+          in: query
+          schema:
+            type: string
+            format: uuid
+          required: false
+        - name: Page
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: PageSize
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 25
+        - name: sort
+          description:
+            The sorting parameters in the format of "fieldName,asc/desc". E.g.
+            type,desc
+          in: query
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - "code,asc"
+                - "code,desc"
+                - "organzationName,asc"
+                - "organzationName,desc"
+                - "procedureName,asc"
+                - "procedureName,desc"
+                - "organizationCreated,asc"
+                - "organizationCreated,desc"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Page"
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/ContractResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    post:
+      summary: Create a contract between a laboratory and an organization.
+      description: |
+        Use this to
+        - initiate the dataexchange. The contract needs to define which examinations are exchanged.
+      operationId: CreateContract
+      security:
+        - BearerAuth: []
+      tags:
+        - Laboratory
+      parameters:
+        - name: laboratoryId
+          in: path
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              description: application/glims+json upload glims structured results in json format
+              type: array
+              items:
+                description: Request body for creating a new contract between a laboratory and an organization
+                type: object
+                required:
+                  - organizationId
+                  - sampleCodeRanges
+                properties:
+                  organizationId:
+                    description: The ID of the organization involved in the contract
+                    type: string
+                    format: uuid
+                  validFrom:
+                    description: When the contract was established
+                    type: string
+                    format: date
+                    example: "2025-11-21"
+                  validTo:
+                    description: When the contract ended
+                    type: string
+                    format: date
+                    example: "2026-01-01"
+                  examinations:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - procedureId
+                      properties:
+                        procedureId:
+                          type: string
+                          format: uuid
+                        customercode:
+                          type: string
+                          description: Customer specific code of the examination. If omitted, the suggestion from the procedure is used
+                  sampleCodeRanges:
+                    type: array
+                    minItems: 1
+                    maxItems: 10
+                    uniqueItems: true
+                    items:
+                      $ref: "#/components/schemas/SampleCodeRange"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContractResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    patch:
+      summary: Update contracts
+      description: Updates one or more existing contracts for the specified laboratory.
+      operationId: PatchContracts
+      security:
+        - BearerAuth: []
+      tags:
+        - Laboratory
+      parameters:
+        - name: laboratoryId
+          in: path
+          required: true
+          description: Laboratory ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                required:
+                  - contractId
+                properties:
+                  contractId:
+                    description: Identifier of the contract to update
+                    type: string
+                    format: uuid
+                  organizationId:
+                    description: Updated organization identifier. If omitted, the existing value is kept.
+                    type: string
+                    format: uuid
+                  validFrom:
+                    description: Updated contract valid-from date
+                    type: string
+                    format: date
+                  validTo:
+                    description: Updated contract valid-to date
+                    type: string
+                    format: date
+                  examinations:
+                    description: Updated examinations assigned to the contract
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - procedureId
+                      properties:
+                        procedureId:
+                          type: string
+                          format: uuid
+                        name:
+                          type: string
+                        customercode:
+                          type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    delete:
+      summary: Delete contracts
+      description: Removes one or more contracts for the specified laboratory.
+      operationId: DeleteContracts
+      security:
+        - BearerAuth: []
+      tags:
+        - Laboratory
+      parameters:
+        - name: laboratoryId
+          in: path
+          required: true
+          description: Laboratory ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - contractIds
+              properties:
+                contractIds:
+                  description: Identifiers of the contracts to delete
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /v4/laboratories/{laboratoryId}/contracts/{contractId}/examinations:
+    post:
+      summary: Add a new examination to an existing contract
+      description: |
+        Adds a new examination to an existing contract between a laboratory and an organization.
+      operationId: AddExaminationToContract
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      tags:
+        - Laboratory
+      parameters:
+        - name: laboratoryId
+          in: path
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - name: contractId
+          in: path
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              description: Define Procedures to add to the contract
+              type: array
+              items:
+                type: object
+                required:
+                  - procedureId
+                properties:
+                  procedureId:
+                    type: string
+                    format: uuid
+                  examinationCode:
+                    type: string
+                    description: Customer specific code of the examination. If omitted, the suggestion from the procedure is used
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "409":
+          description: Conflict. Examination already exists in the contract
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    patch:
+      summary: Update examinations 
+      description: Updates one or more existing contracts for the specified laboratory.
+      operationId: PatchExaminationsInContracts
+      security:
+        - BearerAuth: []
+      tags:
+        - Laboratory
+      parameters:
+        - name: laboratoryId
+          in: path
+          required: true
+          description: Laboratory ID
+          schema:
+            type: string
+            format: uuid
+        - name: contractId
+          in: path
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                required:
+                  - examinationId
+                properties:
+                  examinationCode:
+                    type: string
+                  examinationId:
+                    type: string
+                    format: uuid
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    delete:
+      summary: Delete examinations in contracts
+      description: Removes one or more examinations from the specified contract.
+      operationId: RemoveExaminationsFromContract
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      tags:
+        - Laboratory
+      parameters:
+        - name: laboratoryId
+          in: path
+          required: true
+          description: Laboratory ID
+          schema:
+            type: string
+            format: uuid
+        - name: contractId
+          in: path
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                required:
+                  - examinationId
+                properties:
+                  examinationId:
+                    description: Identifiers of the examinations to delete
+                    type: string
+                    format: uuid
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /v4/laboratories/{laboratoryId}/contracts-query:
+    post:
+      summary: Query contracts
+      description: |
+        Retrieves a list of contracts along with organizations and laboratories
+        that have contracts.
+      operationId: QueryContracts
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      tags:
+        - Laboratory
+      parameters:
+        - name: laboratoryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: Page
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: PageSize
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 25
+        - name: sort
+          description:
+            The sorting parameters in the format of "fieldName,asc/desc". E.g.
+            type,desc
+          in: query
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - "validFrom,asc"
+                - "validFrom,desc"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                organizationIds:
+                  description: Filter by Organization IDs
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Page"
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/ContractResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /v4/locations:
+    get:
+      summary: Get locations
+      operationId: GetLocations
+      security:
+        - BearerAuth: []
+      description: Gets all location of the authenticated user.
+      tags:
+        - Locations
+      parameters:
+        - name: page
+          description: The desired page number
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: pageSize
+          description: The desired number of items per page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 25
+        - name: sort
+          description:
+            The sorting parameters in the format of "fieldName,asc/desc". E.g.
+            type,desc
+          in: query
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - "name,asc"
+                - "name,desc"
+        - name: filterName
+          description: The name filter
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Page"
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Location"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    post:
+      security:
+        - BearerAuth: []
+      description: Creates new locations for the authenticated user.
+      tags:
+        - Locations
+      summary: Create locations
+      operationId: CreateLocations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/CreateLocationRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Location"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    delete:
+      security:
+        - BearerAuth: []
+      description: Deletes a location for the authenticated user.
+      tags:
+        - Locations
+      summary: Delete location
+      operationId: DeleteLocation
+      parameters:
+        - name: locationId
+          description: The location ID
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /v4/login:
+    post:
+      summary: OAuth 2.0 Authentication
+      description: OAuth 2.0 Ressource Owner Password Credentials Grant
+      tags:
+        - Auth
+      security: []
+      operationId: Login
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                password:
+                  description: The password
+                  type: string
+                  format: password
+                username:
+                  description: The username
+                  type: string
+              required:
+                - password
+                - username
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthTokenResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /v4/authorize:
+    get:
+      summary: Authorization endpoint for PKCE
+      description: OAuth 2.0 Authorization endpoint for PKCE flow
+      tags:
+        - Auth
+      operationId: Authorize
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: response_type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - code
+          description: Must be "code" for PKCE flow
+        - name: client_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The client identifier
+        - name: redirect_uri
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uri
+          description: The redirect URI where authorization code will be sent
+        - name: scope
+          in: query
+          required: false
+          schema:
+            type: string
+            default: api
+          description: The requested scope
+        - name: state
+          in: query
+          required: false
+          schema:
+            type: string
+          description: An opaque value to prevent CSRF attacks
+        - name: code_challenge
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Code challenge for PKCE
+        - name: code_challenge_method
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - S256
+          description: Code challenge method, must be S256
+      responses:
+        "200":
+          description: OK - User authentication required
+          content:
+            application/json:
+              schema:
+                type: string
+        "302":
+          description: Redirect to authorization server or redirect_uri with authorization code
+          headers:
+            Location:
+              description: Redirect location
+              schema:
+                type: string
+                format: uri
+        "400":
+          description: Bad Request - Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized - Authentication required
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /v4/token:
+    post:
+      summary: Token endpoint for PKCE
+      description: OAuth 2.0 Token endpoint for PKCE flow
+      tags:
+        - Auth
+      operationId: Token
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - grant_type
+                - client_id
+                - code
+                - redirect_uri
+                - code_verifier
+              properties:
+                grant_type:
+                  type: string
+                  enum:
+                    - authorization_code
+                  description: Must be "authorization_code" for PKCE flow
+                client_id:
+                  type: string
+                  description: The client identifier
+                code:
+                  type: string
+                  description: The authorization code received from the authorization endpoint
+                redirect_uri:
+                  type: string
+                  format: uri
+                  description: The redirect URI used in the authorization request
+                code_verifier:
+                  type: string
+                  description: Code verifier for PKCE
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthTokenResponse"
+        "400":
+          description: Bad Request - Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized - Invalid authorization code or client credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /v4/orders:
+    post:
+      summary: Create order(s)
+      description: |
+        Creates orders in Lablink. Orders can be created by providing JSON or text/exlab payloads directly. A list of the created orderIDs is
+        returned.
+      security:
+        - BearerAuth: []
+      tags:
+        - Order
+      operationId: CreateOrders
+      parameters:
+        - description: Fail entire batch on error
+          name: failOnError
+          in: query
+          schema:
+            type: boolean
+        - description: A laboratory ID that is used to complete missing ids in the submitted order
+          name: laboratoryId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - description: A location ID that is used to complete missing IDs in the submitted order
+          name: locationId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                required:
+                  - type
+                  - examinations
+                  - laboratoryId
+                  - locationId
+                properties:
+                  type:
+                    description: The order type
+                    allOf:
+                      - $ref: "#/components/schemas/OrderType"
+                  boneMarrowDonor:
+                    description: The bone-marrow donor data when type is BONE_MARROW_DONOR
+                    allOf:
+                      - $ref: "#/components/schemas/BoneMarrowDonor"
+                  laboratoryId:
+                    description: The laboratory ID where the order will be sent
+                    type: string
+                    format: uuid
+                  locationId:
+                    description: Identifier of the location (client)
+                    type: string
+                    format: uuid
+                  patient:
+                    description: The patient data when type is PERSONAL
+                    $ref: "#/components/schemas/Patient"
+                  pseudonym:
+                    description: The pseudonym data when type is PSEUDONYM
+                    $ref: "#/components/schemas/Pseudonym"
+                  bloodDonor:
+                    description: The blood donor data when type is DONOR
+                    $ref: "#/components/schemas/BloodDonor"
+                  references:
+                    description: |
+                      Information in key:value pairs object array. Information
+                      stored here is reflected back when reading the orders again thus allows for storing keys.
+                    $ref: "#/components/schemas/KeyValueMap"
+                  tags:
+                    description: The tags belonging to the order
+                    $ref: "#/components/schemas/OrderTags"
+                  items:
+                    description: The items belonging to the order
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - sampleCode
+                        - collectionTime
+                      properties:
+                        examinationId:
+                          description: |
+                            ExaminationID as provided by the GetExaminations endpoint. Aas an alternative
+                            id can be used.
+                          type: string
+                          format: uuid
+                        examinationCode:
+                          description: |
+                            The code of the examination as configured. As an alternative id can be used.
+                          type: string
+                        reference:
+                          description: |
+                            A field to hold an external reference for the examination. Those references will
+                            be reflected back when reading the orders again thus allows for storing keys.
+                          type: string
+                        sampleCode:
+                          description: |
+                            The sample codes for this order. They must be permitted by the laboratory. Lablink
+                            verifies that the order is not colliding with any other orders to that laboratory.
+                            In such cases it is possible that the order gets declined with a Conflict error.
+                          type: string
+                        collectionTime:
+                          description: |
+                            The collection time of the sample. It is recommended to use the precise time.
+                            If only the Date is availabe opt for 12 o'clock to avoid misterpretations in
+                            timezones.
+                          type: string
+                          format: date-time
+          text/plain+exlab:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OrderMetadata"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "413":
+          description: Content Too Large
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    delete:
+      security:
+        - BearerAuth: []
+      description: Deletes all order with the provided ids.
+      tags:
+        - Order
+      summary: Delete orders
+      operationId: DeleteOrders
+      parameters:
+        - name: orderIds
+          description: List of order IDs to delete
+          in: query
+          required: true
+          explode: true
+          schema:
+            type: array
+            minItems: 1
+            maxItems: 25
+            items:
+              type: string
+              format: uuid
+      responses:
+        "207":
+          description:
+            Partially processed. A list of **NOT** deleted orderIDs is
+            returned. All other Orders are guaranteed to be deleted.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /v4/orders-query:
+    post:
+      security:
+        - BearerAuth: []
+      description: Query orders with filters in request body
+      tags:
+        - Order
+      summary: Query orders
+      operationId: QueryOrders
+      parameters:
+        - name: page
+          description: Page number
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: pageSize
+          description: Number of items per page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: expand
+          description: Fields to expand in the response
+          in: query
+          schema:
+            type: array
+            default: [details, state, documents]
+            items:
+              type: string
+              enum:
+                - documents
+                - state
+                - items
+                - details
+                - full
+        - name: sort
+          description:
+            The sorting parameters in the format of "fieldName,asc/desc". E.g.
+            state,desc
+          in: query
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - "state,asc"
+                - "state,desc"
+                - "reference,asc"
+                - "reference,desc"
+                - "createdAt,asc"
+                - "createdAt,desc"
+        - name: transaction
+          description: |
+            Transaction mode. Use the two-stage mode for transactions that require approval. Two-Stage is
+            not locking the order and the last reader will win.
+          in: query
+          schema:
+            default: none
+            type: string
+            enum:
+              - none
+              - twostage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                ids:
+                  description: Filter by order IDs
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                state:
+                  description: Filter by order states
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/OrderStateType"
+                withTags:
+                  description: Orders must have all of these tags
+                  type: array
+                  items:
+                    type: string
+                withoutTags:
+                  description: Orders must not have any of these tags
+                  type: array
+                  items:
+                    type: string
+                sampleCodes:
+                  description: Filter by sample codes
+                  type: array
+                  items:
+                    type: string
+                organizationIds:
+                  description: Filter by organization IDs
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                locationIds:
+                  description: Filter by location IDs
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                laboratoryIds:
+                  description: Filter by laboratory IDs
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+        description: The order query filters and pagination
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Page"
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Order"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /v4/orders-query/{transactionId}:
+    patch:
+      summary: Commit or Rollback a transaction started with .../query
+      security:
+        - BearerAuth: []
+      description: |
+        Commit or rollback a transaction started with /query?transaction=.... Calling
+        with SetTags or RemoveTags the order can be tagged.
+      tags:
+        - Order
+      operationId: OrderTransaction
+      parameters:
+        - name: transactionId
+          description: TransactionId as returned by query
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                addTags:
+                  description: Tags to be added to all orders
+                  type: array
+                  maxItems: 10
+                  items:
+                    $ref: "#/components/schemas/OrderTag"
+                removeTags:
+                  description: Tags to be removed from all orders
+                  type: array
+                  maxItems: 10
+                  items:
+                    $ref: "#/components/schemas/OrderTag"
+                setstate:
+                  description: Update order Status (requires permissions)
+                  $ref: "#/components/schemas/OrderStateType"
+        description: The order query filters and pagination
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "410":
+          description: Gone. The lock has been dissolved. Restart the transaction.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "409":
+          description: |
+            Conflict. This can happen when this transaction had been invalidated.
+            The last writer always wins. The initial request needs to be repeated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /v4/orders/tags:
+    post:
+      summary: Add Tags to orders
+      security:
+        - BearerAuth: []
+      description: |
+        Tags order or orders with tag or tags. n:n relation
+      tags:
+        - Tagging API
+      operationId: TagOrders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - orderIds
+                - tags
+              properties:
+                orderIds:
+                  type: array
+                  minItems: 1
+                  maxItems: 100
+                  items:
+                    type: string
+                    format: uuid
+                tags:
+                  type: array
+                  minItems: 1
+                  maxItems: 10
+                  items:
+                    $ref: "#/components/schemas/OrderTag"
+        description: The order IDs and their tags
+        required: true
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    delete:
+      security:
+        - BearerAuth: []
+      description: Remove tag(s) from order(s) - n:n relation
+      tags:
+        - Tagging API
+      summary: Delete tag(s) from order(s)
+      operationId: DeleteOrderTags
+      parameters:
+        - name: orderIds
+          description: List of order IDs to remove tags from
+          in: query
+          required: true
+          explode: true
+          schema:
+            type: array
+            minItems: 1
+            maxItems: 100
+            items:
+              type: string
+              format: uuid
+        - name: tags
+          description: List of tags to be removed
+          in: query
+          required: true
+          explode: true
+          schema:
+            type: array
+            minItems: 1
+            maxItems: 100
+            items:
+              $ref: "#/components/schemas/OrderTag"
+      responses:
+        "200":
+          description: OK
+        "207":
+          description:
+            Partially processed. A list of order IDs where tags were not
+            removed is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notRemoved:
+                    description: List of order IDs where tags were not removed
+                    type: array
+                    items:
+                      type: string
+                      format: uuid
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  "/v4/orders/{orderId}":
+    get:
+      security:
+        - BearerAuth: []
+      description: Gets an order.
+      tags:
+        - Order
+      summary: Get order
+      operationId: GetOrder
+      parameters:
+        - description: The order ID
+          name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    delete:
+      security:
+        - BearerAuth: []
+      description: Deletes an order.
+      tags:
+        - Order
+      summary: Delete order
+      operationId: DeleteOneOrder
+      parameters:
+        - description: The order ID
+          name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  "/v4/orders/{orderId}/examinations":
+    get:
+      summary: Get all items of an order
+      tags:
+        - Order
+      security:
+        - BearerAuth: []
+      operationId: GetExaminationsOfOrder
+      parameters:
+        - name: orderId
+          description: The order ID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OrderExaminationResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    post:
+      summary: Add an item to an order
+      tags:
+        - Order
+      security:
+        - BearerAuth: []
+      operationId: AddExaminationsToOrder
+      parameters:
+        - description: The order ID
+          name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              additionalProperties: false
+              type: array
+              minItems: 1
+              maxItems: 50
+              items:
+                type: object
+                required:
+                  - sampleCode
+                  - collectionTime
+                properties:
+                  examinationId:
+                    description: Reference to Examination ID (you have to use either examinationId or code)
+                    type: string
+                    format: uuid
+                  examinationCode:
+                    description: The code of the Examination (you have to use either examinationId or code)
+                    type: string
+                  reference:
+                    description: The external unique identifier of the order's item
+                    type: string
+                  sampleCode:
+                    description: The sample code
+                    type: string
+                  collectionTime:
+                    description: The collection time of the sample
+                    type: string
+                    format: date-time
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - code
+                    - name
+                    - description
+                    - unit
+                    - sampleCode
+                    - collectionTime
+                    - results
+                  properties:
+                    id:
+                      description: Reference to Order Item.
+                      type: string
+                      format: uuid
+                    examinationId:
+                      description: Reference to Examination.
+                      type: string
+                      format: uuid
+                    code:
+                      description: Custom code for this examination
+                      type: string
+                    collectionTime:
+                      description: The sample time
+                      type: string
+                      format: date-time
+                    description:
+                      description: The description of the organization examination
+                      type: string
+                    name:
+                      description: The name of the organization examination
+                      type: string
+                    sampleCode:
+                      description: The sample codes
+                      type: string
+                    unit:
+                      description: The unit of the organization examination
+                      type: string
+                    results:
+                      description: The results belonging to the order
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/Result"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    delete:
+      summary: |
+        Remove an item from an order. When the last item is removed, the whole order is deleted.
+      tags:
+        - Order
+      security:
+        - BearerAuth: []
+      operationId: DeleteExaminationsFromOrder
+      parameters:
+        - description: The order ID
+          name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: itemId
+          description: List of items to be removed
+          in: query
+          required: true
+          explode: true
+          schema:
+            type: array
+            minItems: 1
+            maxItems: 100
+            items:
+              type: string
+              format: uuid
+      responses:
+        "200":
+          description: OK
+        "207":
+          description:
+            Partially processed. A list of item IDs where not removed is
+            returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notRemoved:
+                    description: List of item IDs where not removed
+                    type: array
+                    items:
+                      type: string
+                      format: uuid
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /v4/organizations:
+    get:
+      summary: Get organizations
+      description: Retrieves all organizations.
+      operationId: GetOrganizations
+      tags:
+        - Organizations
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: name
+          description: Filter by name. Thhis supports partial matches.
+          in: query
+          required: false
+          schema:
+            type: string
+          example: John Doe Clinic
+        - name: organizationID
+          description: Filter by organization IDs. If omitted all organizations are returned.
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        - name: email
+          description: Filter by email addresses associated with the organizations.
+          in: query
+          required: false
+          schema:
+            type: array
+            minItems: 1
+            maxItems: 7
+            items:
+              type: string
+              format: email
+              maxLength: 320
+              example: "user@example.com"
+        - name: roles
+          description: Filter by organization roles.
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/OrganizationRole"
+        - name: page
+          description: Page number, starts at 0.
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          example: 783
+        - name: pageSize
+          description: Number of items per page. Maximum is 200.
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 20
+          example: 10
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Organization"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        "500":
+          description: Failed to get organizations
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+    post:
+      summary: Create organizations
+      description: Creates one or more organizations for the authenticated user.
+      operationId: CreateOrganizations
+      tags:
+        - Organizations
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                required:
+                  - name
+                properties:
+                  name:
+                    description: The name of the organization
+                    type: string
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Organization"
+        "400":
+          description: Invalid request payload
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        "500":
+          description: Failed to create organization
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+  /v4/organizations-query:
+    post:
+      security:
+        - BearerAuth: []
+      description: Query Organizations with filters in request body
+      tags:
+        - Order
+      summary: Query organizations
+      operationId: QueryOrganizations
+      parameters:
+        - name: page
+          description: Page number
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: pageSize
+          description: Number of items per page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: sort
+          description:
+            The sorting parameters in the format of "fieldName,asc/desc". E.g.
+            state,desc
+          in: query
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - "name,asc"
+                - "name,desc"
+                - "created_at,asc"
+                - "created_at,desc"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                organizationIDs:
+                  description: Filter by order IDs
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                    example: "123e4567-e89b-12d3-a456-426614174000"
+                name:
+                  type: string
+                  maxLength: 500
+                  example: John Doe Clinic
+                emails:
+                  type: array
+                  minItems: 1
+                  maxItems: 250
+                  items:
+                    type: string
+                    format: email
+                    maxLength: 320
+                    example: "user@example.com"
+                roles:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/OrganizationRole"
+        description: The order query filters and pagination
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Page"
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Organization"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  "/v4/organizations/{organizationId}":
+    patch:
+      summary: Update organization
+      description: Updates a single organization owned by the authenticated user.
+      operationId: UpdateOrganization
+      tags:
+        - Organizations
+      security:
+        - BearerAuth: []
+      parameters:
+        - description: Organization ID
+          name: organizationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrganizationUpdateMessage"
+        description: Update payload
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Organization"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        "404":
+          description: Organization not found
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        "500":
+          description: Failed to update organization
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+  schemas:
+    ApiError:
+      type: object
+      required:
+        - subcode
+        - message
+      properties:
+        subcode:
+          description: Subcode to the errorcode to describe the error more precisely
+          type: string
+          enum:
+            [
+              NO_CODE,
+              INVALID_ID,
+              INVALID_ORGANIZATION,
+              VALIDATION_ERROR,
+              INVALID_CONTENTTYPE,
+            ]
+        message:
+          description: Error message
+          type: string
+        details:
+          description: Further details about the error
+          type: string
+    BloodDonor:
+      type: object
+      required:
+        - dateOfBirth
+        - donationCode
+        - donorCode
+        - gender
+      properties:
+        bloodType:
+          description: The blood type
+          allOf:
+            - $ref: "#/components/schemas/BloodType"
+        cde:
+          description: The CDE
+          type: string
+        dateOfBirth:
+          description: The date of birth (yyyy-MM-dd)
+          type: string
+          format: date
+        donationCode:
+          description: The donation code
+          type: string
+        donorCode:
+          description: The donor code
+          type: string
+        donorType:
+          description:
+            "The donor type (E: first-time donor, 2: second-time donor, M:
+            multi-time donor)"
+          type: string
+        gender:
+          description: The gender (Female, Male, Unknown)
+          allOf:
+            - $ref: "#/components/schemas/Gender"
+        kell:
+          description: The Kell factor
+          allOf:
+            - $ref: "#/components/schemas/Kell"
+        rhesus:
+          description: The rhesus factor
+          allOf:
+            - $ref: "#/components/schemas/Rhesus"
+    BloodType:
+      type: string
+      enum:
+        - A
+        - B
+        - "0"
+        - 0h
+        - AB
+    BloodlabBloodDonor:
+      type: object
+      required:
+        - dateOfBirth
+        - donationCode
+        - donorCode
+        - gender
+      properties:
+        bloodType:
+          description: The blood type
+          enum:
+            - A
+            - B
+            - "0"
+            - 0h
+            - AB
+          allOf:
+            - $ref: "#/components/schemas/BloodType"
+        cde:
+          description: The CDE
+          type: string
+        dateOfBirth:
+          description: The date of birth (yyyy-MM-dd)
+          type: string
+          format: date
+        donationCode:
+          description: The donation code
+          type: string
+        donorCode:
+          description: The donor code
+          type: string
+        donorType:
+          description:
+            "The donor type (E: first-time donor, 2: second-time donor, M:
+            multi-time donor)"
+          type: string
+        gender:
+          description: The gender (Female, Male, Unknown)
+          enum:
+            - F
+            - M
+            - U
+          allOf:
+            - $ref: "#/components/schemas/Gender"
+        kell:
+          description: The Kell factor
+          enum:
+            - pos
+            - neg
+          allOf:
+            - $ref: "#/components/schemas/Kell"
+        rhesus:
+          description: The rhesus factor
+          enum:
+            - pos
+            - neg
+            - "1"
+            - "2"
+          allOf:
+            - $ref: "#/components/schemas/Rhesus"
+    BloodlabBoneMarrowDonor:
+      type: object
+      properties:
+        donorCode:
+          description: The donor code
+          type: string
+    BloodlabExamination:
+      type: object
+      properties:
+        code:
+          description: The code
+          type: string
+        description:
+          description: The description
+          type: string
+        id:
+          description: The ID
+          type: string
+          format: uuid
+        name:
+          description: The name
+          type: string
+        possibleValues:
+          description: The possible result values
+          type: string
+        unit:
+          description: The unit
+          type: string
+    BloodlabLocation:
+      type: object
+      properties:
+        id:
+          description: The ID
+          type: string
+          format: uuid
+        name:
+          description: The name
+          type: string
+    BloodlabOrder:
+      type: object
+      required:
+        - examinations
+        - laboratoryId
+        - locationId
+        - type
+      properties:
+        bloodDonor:
+          description: The blood donor data when type is DONOR
+          allOf:
+            - $ref: "#/components/schemas/BloodlabBloodDonor"
+        boneMarrowDonor:
+          description: The bone-marrow donor data when type is BONE_MARROW_DONOR
+          allOf:
+            - $ref: "#/components/schemas/BloodlabBoneMarrowDonor"
+        examinations:
+          description: The examinations belonging to the order
+          type: array
+          items:
+            $ref: "#/components/schemas/BloodlabOrderExamination"
+        id:
+          description: The ID of the order
+          type: string
+          format: uuid
+        laboratoryId:
+          description: The laboratory ID
+          type: string
+        locationId:
+          description: Identifier of the location (client)
+          type: string
+        orderCreationDateTime:
+          description: The order creation date-time (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+          type: string
+          format: date-time
+        patient:
+          description: The patient data when type is PERSONAL
+          allOf:
+            - $ref: "#/components/schemas/BloodlabPatient"
+        pseudonym:
+          description: The pseudonym data when type is PSEUDONYM
+          allOf:
+            - $ref: "#/components/schemas/BloodlabPseudonym"
+        reference:
+          description: The external unique identifier of the order
+          type: string
+        referenceMap:
+          description: Additional external information in key:value pairs object array
+          type: array
+          items:
+            $ref: "#/components/schemas/KeyValueMap"
+        state:
+          description: The order state
+          allOf:
+            - $ref: "#/components/schemas/OrderStateType"
+        type:
+          description: The order type
+          enum:
+            - BONE_MARROW_DONOR
+            - DONOR
+            - PERSONAL
+            - PSEUDONYM
+          allOf:
+            - $ref: "#/components/schemas/OrderType"
+    BloodlabOrderExamination:
+      type: object
+      required:
+        - examinationId
+        - id
+        - organizationExaminationId
+      properties:
+        examinationId:
+          description: The ID of the examination
+          type: string
+        id:
+          description: The ID of the order-examination
+          type: string
+        organizationExaminationId:
+          description: The ID of the examination
+          type: string
+        reference:
+          description: The external unique identifier of the order
+          type: string
+        results:
+          description: The results belonging to the order
+          type: array
+          items:
+            $ref: "#/components/schemas/Result"
+        sampleCodes:
+          description: The sample codes
+          type: array
+          items:
+            type: string
+        sampleDate:
+          description: The sample date
+          type: string
+          format: date
+        sampleTime:
+          description: The sample time
+          type: string
+          format: time
+    BloodlabOrganizationRelation:
+      type: object
+      properties:
+        examinations:
+          description: The organization's examinations
+          type: array
+          items:
+            $ref: "#/components/schemas/BloodlabExamination"
+        locations:
+          description: The organization's locations
+          type: array
+          items:
+            $ref: "#/components/schemas/BloodlabLocation"
+        organizationId:
+          description: The organization ID
+          type: string
+          format: uuid
+    BloodlabPatient:
+      type: object
+      required:
+        - dateOfBirth
+        - firstName
+        - gender
+        - lastName
+      properties:
+        address:
+          description: The address
+          type: string
+        city:
+          description: The city
+          type: string
+        country:
+          description: The country
+          type: string
+        dateOfBirth:
+          description: The date of birth (yyyy-MM-dd)
+          type: string
+          format: date
+        firstName:
+          description: The first name
+          type: string
+        gender:
+          description: The gender (Female, Male, Unknown)
+          enum:
+            - F
+            - M
+            - U
+          allOf:
+            - $ref: "#/components/schemas/Gender"
+        lastName:
+          description: The last name
+          type: string
+        phoneNumberPrimary:
+          description: The primary phone number
+          type: string
+        phoneNumberSecondary:
+          description: The secondary phone number
+          type: string
+        postCode:
+          description: The post
+          type: string
+    BloodlabPseudonym:
+      type: object
+      properties:
+        code:
+          description: The code
+          type: string
+        dateOfBirth:
+          description: The date of birth (yyyy-MM-dd)
+          type: string
+          format: date
+        gender:
+          description: The gender (Female, Male, Unknown)
+          enum:
+            - F
+            - M
+            - U
+          allOf:
+            - $ref: "#/components/schemas/Gender"
+    BoneMarrowDonor:
+      type: object
+      required:
+        - donorCode
+      properties:
+        donorCode:
+          description: The donor code
+          type: string
+    DocumentMetadata:
+      type: object
+      required:
+        - documentId
+        - fileName
+        - fileType
+        - fileSize
+        - link
+        - storedAt
+      properties:
+        documentId:
+          description: The document ID
+          type: string
+          format: uuid
+        fileName:
+          description: The filename
+          type: string
+          maxLength: 1024
+        fileType:
+          description: The file type
+          type: string
+          maxLength: 32
+        fileSize:
+          description: The file size (in bytes)
+          type: integer
+          format: int64
+        link:
+          description: The links to the file
+          $ref: "#/components/schemas/Link"
+        storedAt:
+          description: The time when it got stored
+          type: string
+          format: date-time
+    ProcedureResponse:
+      type: object
+      properties:
+        id:
+          description: Unique identifier for the procedure
+          type: string
+          format: uuid
+        code:
+          description: A default code suggested for simple reference. This is not a Primary key and may not be unique
+          type: string
+        name:
+          description: A distinct and name of the offered procedure
+          type: string
+        description:
+          description: The description of the procedure
+          type: string
+        unit:
+          description: The unit of the procedure
+          type: string
+        dataType:
+          description: The data type of the procedure that is used as the result type
+          type: string
+        codeSystems:
+          description:
+            The coding system. Currently supported are loinc and snomed, abo_phenotype Standards,
+            p_group, g_group
+          type: array
+          items:
+            type: object
+            properties:
+              codingSystem:
+                $ref: "#/components/schemas/CodingSystem"
+              code:
+                type: string
+    CodingSystem:
+      description: |
+        The coding system. Currently supported are
+         - LOINC see https://loing.org
+         - SNOMED-CT see https://snomed.org
+         - ABO Phenotype Standard (AB0,Rh,Kell,...)
+         - AB0 DRK with the DRK additons (D-1/D-2) https://www.drk-haemotherapie.de/beitraege/molekulare-diagnostik-in-der-immunhamatologie/herunterladen
+         - p_group P-Level-Proteine Group https://www.ebi.ac.uk/ipd
+         - g_group G-Level-Proteine Group https://www.ebi.ac.uk/ipd
+        Leave empty for internal code
+      type: string
+      enum:
+        - loinc
+        - snomed
+        - ab0_phenotype
+        - ab0_drk
+        - p_group
+        - g_group
+    Procedure:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - unit
+        - dataType
+      properties:
+        id:
+          description: Unique identifier for the procedure
+          type: string
+          format: uuid
+        code:
+          description: A default code suggested for simple reference. This is not a Primary key and may not be unique
+          type: string
+        name:
+          description: A distinct and name of the offered procedure
+          type: string
+        description:
+          description: The description of the procedure
+          type: string
+        unit:
+          description: The unit
+          type: string
+        dataType:
+          $ref: "#/components/schemas/DataType"
+        codeSystems:
+          description:
+            The coding system. Currently supported are loinc and snomed, abo_phenotype Standards,
+            p_group, g_group
+          type: array
+          items:
+            type: object
+            properties:
+              codingSystem:
+                type: string
+                enum:
+                  - loinc
+                  - snomed
+                  - abo_phenotype
+                  - p_group
+                  - g_group
+              code:
+                type: string
+    DataType:
+      description: The logical data type used for laboratory results
+      type: string
+      enum:
+        - int
+        - decimal
+        - string
+        - pein
+        - react
+        - invalid
+        - enum
+    Examination:
+      type: object
+      properties:
+        code:
+          description: The code
+          type: string
+        description:
+          description: The description
+          type: string
+        id:
+          description: The organization examination ID
+          type: string
+          format: uuid
+        laboratoryId:
+          description: The laboratory ID
+          type: string
+          format: uuid
+        name:
+          description: The name
+          type: string
+        possibleValues:
+          description: The possible result values
+          type: string
+        unit:
+          description: The unit
+          type: string
+    Gender:
+      type: string
+      enum:
+        - F
+        - M
+        - U
+    Kell:
+      type: string
+      enum:
+        - pos
+        - neg
+    Link:
+      type: object
+      properties:
+        related:
+          description: The related link to the order
+          type: string
+          format: uri
+        self:
+          description: The link to order itself
+          type: string
+          format: uri
+    Location:
+      type: object
+      required:
+        - id
+        - name
+        - organizationId
+      properties:
+        id:
+          description: The ID
+          type: string
+          format: uuid
+        name:
+          description: The name
+          type: string
+        organizationId:
+          description: The organization ID which the location belongs to
+          type: string
+          format: uuid
+    AuthTokenResponse:
+      type: object
+      properties:
+        access_token:
+          description: The access token
+          type: string
+        expires_in:
+          description: The access token's expiry time window
+          type: integer
+        not-before-policy:
+          description: The date-time when the token becomes valid
+          type: integer
+        refresh_expires_in:
+          description: The refresh token's expiry time window
+          type: integer
+        refresh_token:
+          description: The refresh token
+          type: string
+        scope:
+          description: The session scope (api only)
+          type: string
+        session_state:
+          description: The session state
+          type: string
+        token_type:
+          description: The token type (Bearer only)
+          type: string
+    OrderExaminationResponse:
+      type: object
+      required:
+        - itemId
+        - code
+        - examinationId
+        - name
+        - description
+        - unit
+        - sampleCode
+        - collectionTime
+      properties:
+        itemId:
+          description: Reference to Order Item.
+          type: string
+          format: uuid
+        examinationId:
+          description: Reference to Examination.
+          type: string
+          format: uuid
+        code:
+          description: Custom code for this examination
+          type: string
+        collectionTime:
+          description: The sample time
+          type: string
+          format: date-time
+        description:
+          description: The description of the organization examination
+          type: string
+        name:
+          description: The name of the organization examination
+          type: string
+        sampleCode:
+          description: The sample codes
+          type: string
+        unit:
+          description: The unit of the organization examination
+          type: string
+        result:
+          description: The result if available
+          $ref: "#/components/schemas/Result"
+    OrderResponse:
+      type: object
+      required:
+        - id
+        - examinations
+        - laboratoryId
+        - locationId
+        - state
+        - type
+        - orderCreationDateTime
+      properties:
+        id:
+          description: The ID of the order
+          type: string
+          format: uuid
+        laboratoryId:
+          description: The laboratory ID where the order will be sent
+          type: string
+          format: uuid
+        locationId:
+          description: Identifier of the location (client)
+          type: string
+          format: uuid
+        bloodDonor:
+          description: The blood donor data when type is DONOR
+          allOf:
+            - $ref: "#/components/schemas/BloodDonor"
+        boneMarrowDonor:
+          description: The bone-marrow donor data when type is BONE_MARROW_DONOR
+          allOf:
+            - $ref: "#/components/schemas/BoneMarrowDonor"
+        examinations:
+          description: The examinations belonging to the order
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderExamination"
+        orderCreationDateTime:
+          description: The order creation date-time (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+          type: string
+          format: date-time
+        orderTags:
+          description: The tags belonging to the order
+          type: array
+          items:
+            type: string
+        patient:
+          description: The patient data when type is PERSONAL
+          allOf:
+            - $ref: "#/components/schemas/Patient"
+        pseudonym:
+          description: The pseudonym data when type is PSEUDONYM
+          allOf:
+            - $ref: "#/components/schemas/Pseudonym"
+        references:
+          description: Add information in key:value pairs object array that are stored with the order
+          $ref: "#/components/schemas/KeyValueMap"
+        state:
+          description: The order state
+          allOf:
+            - $ref: "#/components/schemas/OrderStateType"
+        type:
+          description: The order type
+          allOf:
+            - $ref: "#/components/schemas/OrderType"
+    Order:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          description: The ID of the order
+          type: string
+          format: uuid
+        laboratoryId:
+          description: The laboratory ID where the order will be sent
+          type: string
+          format: uuid
+        locationId:
+          description: Identifier of the location
+          type: string
+          format: uuid
+        bloodDonor:
+          description: The blood donor data when type is DONOR
+          allOf:
+            - $ref: "#/components/schemas/BloodDonor"
+        boneMarrowDonor:
+          description: The bone-marrow donor data when type is BONE_MARROW_DONOR
+          allOf:
+            - $ref: "#/components/schemas/BoneMarrowDonor"
+        items:
+          description: The items belonging to the order. Each item represents one examination.
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderExamination"
+        orderCreationDateTime:
+          description: The order creation date-time (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+          type: string
+          format: date-time
+        orderTags:
+          description: The tags belonging to the order
+          type: array
+          items:
+            type: string
+        patient:
+          description: The patient data when type is PERSONAL
+          allOf:
+            - $ref: "#/components/schemas/Patient"
+        pseudonym:
+          description: The pseudonym data when type is PSEUDONYM
+          allOf:
+            - $ref: "#/components/schemas/Pseudonym"
+        references:
+          description: Add information in key:value pairs object array that are stored with the order
+          $ref: "#/components/schemas/KeyValueMap"
+        state:
+          description: The order state
+          allOf:
+            - $ref: "#/components/schemas/OrderStateType"
+        type:
+          description: The order type
+          allOf:
+            - $ref: "#/components/schemas/OrderType"
+        documents:
+          description: The documents associated with the order
+          type: array
+          items:
+            $ref: "#/components/schemas/DocumentMetadata"
+    OrderExamination:
+      type: object
+      required:
+        - itemId
+        - examinationId
+        - examinationCode
+        - sampleCode
+        - collectionTime
+      properties:
+        itemId:
+          description: Reference to Order Item.
+          type: string
+          format: uuid
+        examinationId:
+          description: Reference to examination.
+          type: string
+          format: uuid
+        examinationCode:
+          description: The custom code of the examination that is used in the order item. This is customer specific and can be differ from the procedure code.
+          type: string
+        reference:
+          description: The external unique identifier of the order
+          type: string
+        result:
+          description: The result belonging to the order
+          $ref: "#/components/schemas/Result"
+        sampleCode:
+          description: The sample codes
+          type: string
+        collectionTime:
+          description: The sample time
+          type: string
+          format: date-time
+    OrderMetadata:
+      type: object
+      properties:
+        error:
+          description: Error message for failed orders
+          type: string
+        id:
+          description: The unique identifier of the order
+          type: string
+          format: uuid
+        links:
+          description: The links to the order
+          allOf:
+            - $ref: "#/components/schemas/Link"
+        reference:
+          description: The reference of the order
+          type: string
+    ResultStateType:
+      type: string
+      enum:
+        - FINAL
+        - PRELIMINARY
+        - CORRECTED
+    OrderType:
+      type: string
+      enum:
+        - DONOR
+        - BONE_MARROW_DONOR
+        - PERSONAL
+        - PSEUDONYM
+    ContractResponse:
+      type: object
+      required:
+        - id
+        - organization
+        - laboratory
+        - examinations
+      properties:
+        id:
+          description: The contract ID
+          type: string
+          format: uuid
+        organization:
+          type: object
+          required:
+            - id
+            - name
+          properties:
+            id:
+              description: The organization ID
+              type: string
+              format: uuid
+            name:
+              description: The organization name
+              type: string
+        laboratory:
+          type: object
+          required:
+            - id
+            - name
+          properties:
+            id:
+              description: The laboratory ID
+              type: string
+              format: uuid
+            name:
+              type: string
+        examinations:
+          description: The examinations included in the contract
+          type: array
+          items:
+            $ref: "#/components/schemas/Examination"
+        validFrom:
+          description: First day of validity
+          type: string
+          format: date-time
+        validUntil:
+          description: The contract valid until date
+          type: string
+          format: date-time
+        createdAt:
+          description: The contract creation date-time
+          type: string
+          format: date-time
+        modifiedAt:
+          description: The contract last modification date-time
+          type: string
+          format: date-time
+    Page:
+      type: object
+      properties:
+        currentPage:
+          description: The actual page number
+          type: integer
+          format: int32
+          minimum: 0
+          example: 0
+        items:
+          description: The items
+        pageSize:
+          description: The number of items per page
+          type: integer
+          format: int32
+          minimum: 1
+          example: 50
+        totalCount:
+          description: The total count of items
+          type: integer
+          format: int32
+          example: 69
+        totalPages:
+          description: The total pages
+          type: integer
+          format: int32
+          example: 2
+        transactionId:
+          description: The transaction identifier
+          type: string
+          format: uuid
+    Patient:
+      type: object
+      required:
+        - dateOfBirth
+        - firstName
+        - gender
+        - lastName
+      properties:
+        address:
+          description: The address
+          type: string
+        city:
+          description: The city
+          type: string
+        country:
+          description: The country
+          type: string
+        dateOfBirth:
+          description: The date of birth (yyyy-MM-dd)
+          type: string
+          format: date
+        firstName:
+          description: The first name
+          type: string
+        gender:
+          description: The gender (Female, Male, Unknown)
+          enum:
+            - F
+            - M
+            - U
+          allOf:
+            - $ref: "#/components/schemas/Gender"
+        lastName:
+          description: The last name
+          type: string
+        phoneNumberPrimary:
+          description: The primary phone number
+          type: string
+        phoneNumberSecondary:
+          description: The secondary phone number
+          type: string
+        postCode:
+          description: The post
+          type: string
+    Pseudonym:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          description: The code
+          type: string
+        dateOfBirth:
+          description: The date of birth (yyyy-MM-dd)
+          type: string
+          format: date
+        gender:
+          $ref: "#/components/schemas/Gender"
+    OrderTags:
+      type: array
+      uniqueItems: true
+      items:
+        $ref: "#/components/schemas/OrderTag"
+    OrderTag:
+      type: string
+      pattern: "^[a-zA-Z0-9\\-_\\ ]{1,256}$"
+    KeyValueMap:
+      type: object
+      additionalProperties:
+        type: string
+    Rhesus:
+      type: string
+      enum:
+        - pos
+        - neg
+        - "1"
+        - "2"
+    Result:
+      type: object
+      required:
+        - orderId
+        - itemId
+        - examinationId
+        - result
+        - status
+      properties:
+        orderId:
+          description: The order ID
+          type: string
+          format: uuid
+        itemId:
+          description: The order-examination item ID
+          type: string
+          format: uuid
+        examinationId:
+          description: The order-examination ID.
+          type: string
+          format: uuid
+        result:
+          type: string
+          maxLength: 512
+        status:
+          $ref: "#/components/schemas/ResultStateType"
+        unit:
+          type: string
+          maxLength: 64
+          default: ""
+        dataType:
+          description: The data type of the result
+          $ref: "#/components/schemas/DataType"
+        performedAt:
+          type: string
+          format: date-time
+        validatedAt:
+          type: string
+          format: date-time
+        validatedBy:
+          type: string
+          maxLength: 256
+        infoText:
+          type: string
+          maxLength: 4096
+        confirmationPending:
+          type: boolean
+          description: Indicates if the result requires confirmation.
+    LaboratoryResponse:
+      type: object
+      properties:
+        address:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        createdBy:
+          type: string
+        email:
+          type: string
+        id:
+          type: string
+          format: uuid
+        instanceName:
+          type: string
+        name:
+          type: string
+        phone:
+          type: string
+        postcode:
+          type: string
+        userRoles:
+          type: array
+          items:
+            $ref: "#/components/schemas/LaboratoryUserRelations"
+    LaboratoryShortInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        instanceName:
+          type: string
+        api_access_token:
+          description: API access token for the laboratory
+          type: string
+    Laboratory:
+      type: object
+      properties:
+        address:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        createdBy:
+          type: string
+        email:
+          type: string
+        id:
+          type: string
+          format: uuid
+        instanceName:
+          type: string
+        name:
+          type: string
+        phone:
+          type: string
+        postcode:
+          type: string
+        userRoles:
+          type: array
+          items:
+            $ref: "#/components/schemas/LaboratoryUserRelations"
+    LaboratoryUserRelations:
+      type: object
+      required:
+        - email
+        - role
+      properties:
+        email:
+          type: string
+        role:
+          $ref: "#/components/schemas/UserRole"
+    OrderStateChange:
+      type: object
+      required:
+        - orderId
+        - state
+      properties:
+        orderId:
+          description: The order ID which state will be changed
+          type: string
+          format: uuid
+        state:
+          description: The new state
+          enum:
+            - ACCEPTED
+            - PROCESSING
+            - WAITING_FOR_MATERIAL
+          allOf:
+            - $ref: "#/components/schemas/OrderStateType"
+    Organization:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        contract_laboratories:
+          type: array
+          items:
+            $ref: "#/components/schemas/Laboratory"
+        created_by:
+          type: string
+        id:
+          type: string
+          format: uuid
+        locations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Location"
+        name:
+          type: string
+    OrganizationRole:
+      type: string
+      enum:
+        - ORGANIZATION_ADMIN
+        - USER
+        - API_USER
+    UserRole:
+      type: string
+      enum:
+        - ORGANIZATION_ADMIN
+        - USER
+        - API_USER
+        - LABORATORY
+    OrganizationUpdateMessage:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+    PatchLegacyOrdersRequest:
+      description: Request body for updating legacy order states
+      type: object
+      properties:
+        newState:
+          description: New state to set for the orders (PROCESSING or DOWNLOADED)
+          type: string
+          enum:
+            - PROCESSING
+            - DOWNLOADED
+          example: PROCESSING
+        orderIds:
+          description: Order IDs to mark as downloaded (required for DOWNLOADED state)
+          type: array
+          items:
+            type: string
+          example:
+            - '["550e8400-e29b-41d4-a716-446655440000"]'
+        sampleCodes:
+          description: Sample codes for orders to update (required for PROCESSING state)
+          type: array
+          items:
+            type: string
+          example:
+            - '["SAMPLE001"'
+            - '"SAMPLE002"]'
+    CreateLocationRequest:
+      type: object
+      description: Request body for creating a new location
+      required:
+        - name
+        - organizationId
+      properties:
+        name:
+          type: string
+        organizationId:
+          type: string
+          format: uuid
+    SampleCodeRange:
+      description: |
+        Samplecode ranges are encoded as prefix + counter + postfixDigits.
+        E.g. for prefix "LAB", start 1, end 100, digits 5, postfixDigits 2 the following sample codes are valid:
+        LAB00001XX ... LAB00100XX
+      type: object
+      required:
+        - start
+        - end
+      properties:
+        prefix:
+          type: string
+          description: Prefix of the sample code range (optional)
+        start:
+          type: integer
+          format: int64
+          description: Start of the sample code range
+        end:
+          type: integer
+          format: int64
+          description: End of the sample code range
+        digits:
+          type: integer
+          description: Number of digits reserved for the counter. Shorter numbers will be filled with leading zeros.
+        postfixDigits:
+          type: integer
+          format: int32
+          description: Amount of digits ignored at the end of the code, often used to encode material etc.
+    OrderStateType:
+      description: The order status model
+      type: string
+      enum:
+        - ENTERED
+        - WAITING_FOR_MATERIAL
+        - PROCESSING
+        - CONFIRMATION_PENDING
+        - FINAL
+        - DELETED
+        - ERROR
+    DocumentType:
+      type: string
+      enum:
+        - LAB_REPORT

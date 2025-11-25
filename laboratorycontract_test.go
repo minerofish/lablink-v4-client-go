@@ -26,7 +26,6 @@ func TestLaboratoryContractNew(t *testing.T) {
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Laboratories.Contracts.New(
 		context.TODO(),
@@ -44,7 +43,6 @@ func TestLaboratoryContractNew(t *testing.T) {
 				Examinations: []lablinkv4client.LaboratoryContractNewParamsBodyExamination{{
 					ProcedureID:  "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 					Customercode: lablinkv4client.String("customercode"),
-					Name:         lablinkv4client.String("name"),
 				}},
 				ValidFrom: lablinkv4client.Time(time.Now()),
 				ValidTo:   lablinkv4client.Time(time.Now()),
@@ -72,7 +70,6 @@ func TestLaboratoryContractGetWithOptionalParams(t *testing.T) {
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Laboratories.Contracts.Get(
 		context.TODO(),
@@ -105,7 +102,6 @@ func TestLaboratoryContractUpdate(t *testing.T) {
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
 	)
 	err := client.Laboratories.Contracts.Update(
 		context.TODO(),
@@ -145,46 +141,12 @@ func TestLaboratoryContractDelete(t *testing.T) {
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
 	)
 	err := client.Laboratories.Contracts.Delete(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		lablinkv4client.LaboratoryContractDeleteParams{
 			ContractIDs: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
-		},
-	)
-	if err != nil {
-		var apierr *lablinkv4client.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
-func TestLaboratoryContractQueryWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := lablinkv4client.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
-	)
-	_, err := client.Laboratories.Contracts.Query(
-		context.TODO(),
-		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-		lablinkv4client.LaboratoryContractQueryParams{
-			Page:            lablinkv4client.Int(0),
-			PageSize:        lablinkv4client.Int(1),
-			Sort:            []string{"validFrom,asc"},
-			OrganizationIDs: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
 		},
 	)
 	if err != nil {

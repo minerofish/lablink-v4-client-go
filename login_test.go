@@ -25,7 +25,6 @@ func TestLoginAuthenticate(t *testing.T) {
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Login.Authenticate(context.TODO(), lablinkv4client.LoginAuthenticateParams{
 		Password: "password",

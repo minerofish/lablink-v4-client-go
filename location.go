@@ -86,19 +86,56 @@ func (r *Location) UnmarshalJSON(data []byte) error {
 }
 
 type LocationListResponse struct {
-	Items []Location `json:"items"`
+	// The actual page number
+	CurrentPage int64                      `json:"currentPage"`
+	Items       []LocationListResponseItem `json:"items"`
+	// The number of items per page
+	PageSize int64 `json:"pageSize"`
+	// The total count of items
+	TotalCount int64 `json:"totalCount"`
+	// The total pages
+	TotalPages int64 `json:"totalPages"`
+	// The transaction identifier
+	TransactionID string `json:"transactionId" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Items       respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
+		CurrentPage   respjson.Field
+		Items         respjson.Field
+		PageSize      respjson.Field
+		TotalCount    respjson.Field
+		TotalPages    respjson.Field
+		TransactionID respjson.Field
+		ExtraFields   map[string]respjson.Field
+		raw           string
 	} `json:"-"`
-	Page
 }
 
 // Returns the unmodified JSON received from the API
 func (r LocationListResponse) RawJSON() string { return r.JSON.raw }
 func (r *LocationListResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type LocationListResponseItem struct {
+	// The ID
+	ID string `json:"id,required" format:"uuid"`
+	// The name
+	Name string `json:"name,required"`
+	// The organization ID which the location belongs to
+	OrganizationID string `json:"organizationId,required" format:"uuid"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID             respjson.Field
+		Name           respjson.Field
+		OrganizationID respjson.Field
+		ExtraFields    map[string]respjson.Field
+		raw            string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r LocationListResponseItem) RawJSON() string { return r.JSON.raw }
+func (r *LocationListResponseItem) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 

@@ -26,7 +26,6 @@ func TestOrderExaminationList(t *testing.T) {
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Orders.Examinations.List(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
@@ -50,7 +49,6 @@ func TestOrderExaminationAddWithOptionalParams(t *testing.T) {
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Orders.Examinations.Add(
 		context.TODO(),
@@ -86,13 +84,12 @@ func TestOrderExaminationRemove(t *testing.T) {
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
 	)
 	err := client.Orders.Examinations.Remove(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		lablinkv4client.OrderExaminationRemoveParams{
-			PostionID: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
+			ItemID: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
 		},
 	)
 	if err != nil {

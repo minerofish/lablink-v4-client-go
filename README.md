@@ -349,23 +349,23 @@ which can be used to wrap any `io.Reader` with the appropriate file name and con
 // A file from the file system
 file, err := os.Open("/path/to/file")
 lablinkv4client.LaboratoryUploadDocumentParams{
-	Examination: "examination",
-	File:        file,
-	SampleCode:  "sampleCode",
+	File:    file,
+	OrderID: "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+	Type:    lablinkv4client.LaboratoryUploadDocumentParamsTypeLabReport,
 }
 
 // A file from a string
 lablinkv4client.LaboratoryUploadDocumentParams{
-	Examination: "examination",
-	File:        strings.NewReader("my file contents"),
-	SampleCode:  "sampleCode",
+	File:    strings.NewReader("my file contents"),
+	OrderID: "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+	Type:    lablinkv4client.LaboratoryUploadDocumentParamsTypeLabReport,
 }
 
 // With a custom filename and contentType
 lablinkv4client.LaboratoryUploadDocumentParams{
-	Examination: "examination",
-	File:        lablinkv4client.File(strings.NewReader(`{"hello": "foo"}`), "file.go", "application/json"),
-	SampleCode:  "sampleCode",
+	File:    lablinkv4client.File(strings.NewReader(`{"hello": "foo"}`), "file.go", "application/json"),
+	OrderID: "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+	Type:    lablinkv4client.LaboratoryUploadDocumentParamsTypeLabReport,
 }
 ```
 

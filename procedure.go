@@ -112,17 +112,20 @@ type ProcedureResponse struct {
 	// The coding system. Currently supported are loinc and snomed, abo_phenotype
 	// Standards, p_group, g_group
 	CodeSystems []ProcedureResponseCodeSystem `json:"codeSystems"`
+	// The data type of the procedure that is used as the result type
+	DataType string `json:"dataType"`
 	// The description of the procedure
 	Description string `json:"description"`
 	// A distinct and name of the offered procedure
 	Name string `json:"name"`
-	// The unit
+	// The unit of the procedure
 	Unit string `json:"unit"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
 		Code        respjson.Field
 		CodeSystems respjson.Field
+		DataType    respjson.Field
 		Description respjson.Field
 		Name        respjson.Field
 		Unit        respjson.Field
@@ -169,27 +172,32 @@ func (r *ProcedureResponseCodeSystem) UnmarshalJSON(data []byte) error {
 
 type ProcedureUpdateResponse struct {
 	// Unique identifier for the procedure
-	ID string `json:"id" format:"uuid"`
+	ID string `json:"id,required" format:"uuid"`
 	// A default code suggested for simple reference. This is not a Primary key and may
 	// not be unique
-	Code string `json:"code"`
+	Code string `json:"code,required"`
+	// The logical data type used for laboratory results
+	//
+	// Any of "int", "decimal", "string", "pein", "react", "invalid", "enum".
+	DataType ProcedureUpdateResponseDataType `json:"dataType,required"`
+	// A distinct and name of the offered procedure
+	Name string `json:"name,required"`
+	// The unit
+	Unit string `json:"unit,required"`
 	// The coding system. Currently supported are loinc and snomed, abo_phenotype
 	// Standards, p_group, g_group
 	CodeSystems []ProcedureUpdateResponseCodeSystem `json:"codeSystems"`
 	// The description of the procedure
 	Description string `json:"description"`
-	// A distinct and name of the offered procedure
-	Name string `json:"name"`
-	// The unit
-	Unit string `json:"unit"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
 		Code        respjson.Field
-		CodeSystems respjson.Field
-		Description respjson.Field
+		DataType    respjson.Field
 		Name        respjson.Field
 		Unit        respjson.Field
+		CodeSystems respjson.Field
+		Description respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -200,6 +208,19 @@ func (r ProcedureUpdateResponse) RawJSON() string { return r.JSON.raw }
 func (r *ProcedureUpdateResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// The logical data type used for laboratory results
+type ProcedureUpdateResponseDataType string
+
+const (
+	ProcedureUpdateResponseDataTypeInt     ProcedureUpdateResponseDataType = "int"
+	ProcedureUpdateResponseDataTypeDecimal ProcedureUpdateResponseDataType = "decimal"
+	ProcedureUpdateResponseDataTypeString  ProcedureUpdateResponseDataType = "string"
+	ProcedureUpdateResponseDataTypePein    ProcedureUpdateResponseDataType = "pein"
+	ProcedureUpdateResponseDataTypeReact   ProcedureUpdateResponseDataType = "react"
+	ProcedureUpdateResponseDataTypeInvalid ProcedureUpdateResponseDataType = "invalid"
+	ProcedureUpdateResponseDataTypeEnum    ProcedureUpdateResponseDataType = "enum"
+)
 
 type ProcedureUpdateResponseCodeSystem struct {
 	Code string `json:"code"`
@@ -245,6 +266,10 @@ type ProcedureNewParamsBody struct {
 	Unit param.Opt[string] `json:"unit,omitzero"`
 	// The coding systems used for the procedure
 	CodeSystems []ProcedureNewParamsBodyCodeSystem `json:"codeSystems,omitzero"`
+	// The logical data type used for laboratory results
+	//
+	// Any of "int", "decimal", "string", "pein", "react", "invalid", "enum".
+	DataType string `json:"dataType,omitzero"`
 	paramObj
 }
 
@@ -254,6 +279,12 @@ func (r ProcedureNewParamsBody) MarshalJSON() (data []byte, err error) {
 }
 func (r *ProcedureNewParamsBody) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+func init() {
+	apijson.RegisterFieldValidator[ProcedureNewParamsBody](
+		"dataType", "int", "decimal", "string", "pein", "react", "invalid", "enum",
+	)
 }
 
 type ProcedureNewParamsBodyCodeSystem struct {
@@ -289,6 +320,10 @@ type ProcedureUpdateParams struct {
 	Name        param.Opt[string]                 `json:"name,omitzero"`
 	Unit        param.Opt[string]                 `json:"unit,omitzero"`
 	CodeSystems []ProcedureUpdateParamsCodeSystem `json:"codeSystems,omitzero"`
+	// The logical data type used for laboratory results
+	//
+	// Any of "int", "decimal", "string", "pein", "react", "invalid", "enum".
+	DataType ProcedureUpdateParamsDataType `json:"dataType,omitzero"`
 	paramObj
 }
 
@@ -326,6 +361,19 @@ func (r *ProcedureUpdateParamsCodeSystem) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// The logical data type used for laboratory results
+type ProcedureUpdateParamsDataType string
+
+const (
+	ProcedureUpdateParamsDataTypeInt     ProcedureUpdateParamsDataType = "int"
+	ProcedureUpdateParamsDataTypeDecimal ProcedureUpdateParamsDataType = "decimal"
+	ProcedureUpdateParamsDataTypeString  ProcedureUpdateParamsDataType = "string"
+	ProcedureUpdateParamsDataTypePein    ProcedureUpdateParamsDataType = "pein"
+	ProcedureUpdateParamsDataTypeReact   ProcedureUpdateParamsDataType = "react"
+	ProcedureUpdateParamsDataTypeInvalid ProcedureUpdateParamsDataType = "invalid"
+	ProcedureUpdateParamsDataTypeEnum    ProcedureUpdateParamsDataType = "enum"
+)
+
 type ProcedureListParams struct {
 	// Filter by name. This search is executed as a case-insensitive partial match.
 	Name param.Opt[string] `query:"name,omitzero" json:"-"`
@@ -343,6 +391,11 @@ type ProcedureListParams struct {
 	//
 	// Any of "loinc", "snomed", "ab0_phenotype", "ab0_drk", "p_group", "g_group".
 	CodeSystem CodingSystem `query:"codeSystem,omitzero" json:"-"`
+	// Filter for data type. This search is executed as a case-insensitive partial
+	// match.
+	//
+	// Any of "int", "decimal", "string", "pein", "react", "invalid", "enum".
+	DataType ProcedureListParamsDataType `query:"dataType,omitzero" json:"-"`
 	// The sorting parameters in the format of "fieldName,asc/desc". E.g. type,desc
 	//
 	// Any of "code,asc", "code,desc", "name,asc", "name,desc", "unit,asc",
@@ -358,3 +411,17 @@ func (r ProcedureListParams) URLQuery() (v url.Values, err error) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Filter for data type. This search is executed as a case-insensitive partial
+// match.
+type ProcedureListParamsDataType string
+
+const (
+	ProcedureListParamsDataTypeInt     ProcedureListParamsDataType = "int"
+	ProcedureListParamsDataTypeDecimal ProcedureListParamsDataType = "decimal"
+	ProcedureListParamsDataTypeString  ProcedureListParamsDataType = "string"
+	ProcedureListParamsDataTypePein    ProcedureListParamsDataType = "pein"
+	ProcedureListParamsDataTypeReact   ProcedureListParamsDataType = "react"
+	ProcedureListParamsDataTypeInvalid ProcedureListParamsDataType = "invalid"
+	ProcedureListParamsDataTypeEnum    ProcedureListParamsDataType = "enum"
+)

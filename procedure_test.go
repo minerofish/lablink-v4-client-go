@@ -25,7 +25,6 @@ func TestProcedureNew(t *testing.T) {
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Procedures.New(context.TODO(), lablinkv4client.ProcedureNewParams{
 		Body: []lablinkv4client.ProcedureNewParamsBody{{
@@ -35,6 +34,7 @@ func TestProcedureNew(t *testing.T) {
 				Code:         lablinkv4client.String("code"),
 				CodingSystem: lablinkv4client.CodingSystemLoinc,
 			}},
+			DataType:    "int",
 			Description: lablinkv4client.String("description"),
 			Unit:        lablinkv4client.String("unit"),
 		}},
@@ -60,7 +60,6 @@ func TestProcedureUpdateWithOptionalParams(t *testing.T) {
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Procedures.Update(
 		context.TODO(),
@@ -71,6 +70,7 @@ func TestProcedureUpdateWithOptionalParams(t *testing.T) {
 				Code:         lablinkv4client.String("code"),
 				CodingSystem: lablinkv4client.CodingSystemLoinc,
 			}},
+			DataType:    lablinkv4client.ProcedureUpdateParamsDataTypeInt,
 			Description: lablinkv4client.String("description"),
 			Name:        lablinkv4client.String("name"),
 			Unit:        lablinkv4client.String("unit"),
@@ -97,11 +97,11 @@ func TestProcedureListWithOptionalParams(t *testing.T) {
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Procedures.List(context.TODO(), lablinkv4client.ProcedureListParams{
 		Codes:      []string{"string"},
 		CodeSystem: lablinkv4client.CodingSystemLoinc,
+		DataType:   lablinkv4client.ProcedureListParamsDataTypeInt,
 		Name:       lablinkv4client.String("name"),
 		Page:       lablinkv4client.Int(0),
 		PageSize:   lablinkv4client.Int(1),
@@ -129,7 +129,6 @@ func TestProcedureDelete(t *testing.T) {
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
 	)
 	err := client.Procedures.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {

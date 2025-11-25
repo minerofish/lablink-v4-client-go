@@ -39,7 +39,7 @@ func testWithAPIKeyClient(baseURL, apiKey string) {
 		return
 	}
 
-	for i, examination := range *response {
+	for i, examination := range response.Items {
 		fmt.Printf("%d: %+v\n", i, examination)
 	}
 }

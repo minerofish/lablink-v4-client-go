@@ -3,8 +3,12 @@
 package lablinkv4client_test
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"testing"
 	"time"
@@ -26,20 +30,12 @@ func TestOrderNewWithOptionalParams(t *testing.T) {
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Orders.New(context.TODO(), lablinkv4client.OrderNewParams{
 		FailOnError:  lablinkv4client.Bool(true),
 		LaboratoryID: lablinkv4client.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		LocationID:   lablinkv4client.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		Body: []lablinkv4client.OrderNewParamsBody{{
-			Examinations: []lablinkv4client.OrderNewParamsBodyExamination{{
-				CollectionTime:  time.Now(),
-				SampleCode:      "sampleCode",
-				ExaminationCode: lablinkv4client.String("examinationCode"),
-				ExaminationID:   lablinkv4client.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-				Reference:       lablinkv4client.String("reference"),
-			}},
 			LaboratoryID: "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 			LocationID:   "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 			Type:         lablinkv4client.OrderTypeDonor,
@@ -57,6 +53,13 @@ func TestOrderNewWithOptionalParams(t *testing.T) {
 			BoneMarrowDonor: lablinkv4client.BoneMarrowDonorParam{
 				DonorCode: "donorCode",
 			},
+			Items: []lablinkv4client.OrderNewParamsBodyItem{{
+				CollectionTime:  time.Now(),
+				SampleCode:      "sampleCode",
+				ExaminationCode: lablinkv4client.String("examinationCode"),
+				ExaminationID:   lablinkv4client.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+				Reference:       lablinkv4client.String("reference"),
+			}},
 			Patient: lablinkv4client.PatientParam{
 				DateOfBirth:          time.Now(),
 				FirstName:            "firstName",
@@ -101,7 +104,6 @@ func TestOrderGet(t *testing.T) {
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Orders.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
@@ -125,42 +127,10 @@ func TestOrderDelete(t *testing.T) {
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
 	)
 	err := client.Orders.Delete(context.TODO(), lablinkv4client.OrderDeleteParams{
 		OrderIDs: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
 	})
-	if err != nil {
-		var apierr *lablinkv4client.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
-func TestOrderNewCustom(t *testing.T) {
-	t.Skip("Prism tests are disabled")
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := lablinkv4client.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
-	)
-	_, err := client.Orders.NewCustom(
-		context.TODO(),
-		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-		lablinkv4client.OrderNewCustomParams{
-			LaboratoryID: "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-			Body:         "body",
-		},
-	)
 	if err != nil {
 		var apierr *lablinkv4client.Error
 		if errors.As(err, &apierr) {
@@ -182,7 +152,6 @@ func TestOrderDeleteOrder(t *testing.T) {
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
 	)
 	err := client.Orders.DeleteOrder(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
@@ -194,21 +163,24 @@ func TestOrderDeleteOrder(t *testing.T) {
 	}
 }
 
-func TestOrderGetState(t *testing.T) {
-	t.Skip("Prism tests are disabled")
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
+func TestOrderGetDocument(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		w.Write([]byte("abc"))
+	}))
+	defer server.Close()
+	baseURL := server.URL
 	client := lablinkv4client.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Orders.GetState(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	resp, err := client.Orders.GetDocument(
+		context.TODO(),
+		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		lablinkv4client.OrderGetDocumentParams{
+			OrderID: "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		},
+	)
 	if err != nil {
 		var apierr *lablinkv4client.Error
 		if errors.As(err, &apierr) {
@@ -216,40 +188,17 @@ func TestOrderGetState(t *testing.T) {
 		}
 		t.Fatalf("err should be nil: %s", err.Error())
 	}
-}
+	defer resp.Body.Close()
 
-func TestOrderQueryWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := lablinkv4client.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
-		option.WithAPIKey("My API Key"),
-	)
-	_, err := client.Orders.Query(context.TODO(), lablinkv4client.OrderQueryParams{
-		Page:            lablinkv4client.Int(0),
-		PageSize:        lablinkv4client.Int(1),
-		Sort:            []string{"state,asc"},
-		IDs:             []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
-		LaboratoryIDs:   []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
-		LocationIDs:     []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
-		OrganizationIDs: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
-		SampleCodes:     []string{"string"},
-		State:           []string{"CONFIRMATORY"},
-		WithoutTags:     []string{"string"},
-		WithTags:        []string{"string"},
-	})
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		var apierr *lablinkv4client.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
 		t.Fatalf("err should be nil: %s", err.Error())
+	}
+	if !bytes.Equal(b, []byte("abc")) {
+		t.Fatalf("return value not %s: %s", "abc", b)
 	}
 }

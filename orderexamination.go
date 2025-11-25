@@ -19,6 +19,7 @@ import (
 	"github.com/minerofish/lablink-v4-client-go/option"
 	"github.com/minerofish/lablink-v4-client-go/packages/param"
 	"github.com/minerofish/lablink-v4-client-go/packages/respjson"
+	"github.com/minerofish/lablink-v4-client-go/shared"
 )
 
 // OrderExaminationService contains methods and other services that help with
@@ -40,7 +41,7 @@ func NewOrderExaminationService(opts ...option.RequestOption) (r OrderExaminatio
 	return
 }
 
-// Get all positions of an order
+// Get all items of an order
 func (r *OrderExaminationService) List(ctx context.Context, orderID string, opts ...option.RequestOption) (res *[]OrderExaminationListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if orderID == "" {
@@ -52,7 +53,7 @@ func (r *OrderExaminationService) List(ctx context.Context, orderID string, opts
 	return
 }
 
-// Add a positions to an order
+// Add an item to an order
 func (r *OrderExaminationService) Add(ctx context.Context, orderID string, body OrderExaminationAddParams, opts ...option.RequestOption) (res *[]OrderExaminationAddResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if orderID == "" {
@@ -64,8 +65,8 @@ func (r *OrderExaminationService) Add(ctx context.Context, orderID string, body 
 	return
 }
 
-// Remove a position from an order. When the last position is removed, the whole
-// order is deleted.
+// Remove an item from an order. When the last item is removed, the whole order is
+// deleted.
 func (r *OrderExaminationService) Remove(ctx context.Context, orderID string, body OrderExaminationRemoveParams, opts ...option.RequestOption) (err error) {
 	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
@@ -78,44 +79,6 @@ func (r *OrderExaminationService) Remove(ctx context.Context, orderID string, bo
 	return
 }
 
-type OrderResult struct {
-	// The ID
-	ID string `json:"id,required" format:"uuid"`
-	// The result
-	Result string `json:"result,required"`
-	// The result type
-	ResultType string `json:"resultType,required"`
-	// The result yield date-time
-	ResultYieldDateTime time.Time `json:"resultYieldDateTime,required" format:"date-time"`
-	// The result status
-	//
-	// Any of "FIN", "PRE".
-	Status OrderResultStatus `json:"status,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ID                  respjson.Field
-		Result              respjson.Field
-		ResultType          respjson.Field
-		ResultYieldDateTime respjson.Field
-		Status              respjson.Field
-		ExtraFields         map[string]respjson.Field
-		raw                 string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r OrderResult) RawJSON() string { return r.JSON.raw }
-func (r *OrderResult) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type OrderResultStatus string
-
-const (
-	OrderResultStatusFin OrderResultStatus = "FIN"
-	OrderResultStatusPre OrderResultStatus = "PRE"
-)
-
 type OrderExaminationListResponse struct {
 	// Custom code for this examination
 	Code string `json:"code,required"`
@@ -125,27 +88,27 @@ type OrderExaminationListResponse struct {
 	Description string `json:"description,required"`
 	// Reference to Examination.
 	ExaminationID string `json:"examinationId,required" format:"uuid"`
+	// Reference to Order Item.
+	ItemID string `json:"itemId,required" format:"uuid"`
 	// The name of the organization examination
 	Name string `json:"name,required"`
-	// Reference to Order Position.
-	PositionID string `json:"positionId,required" format:"uuid"`
 	// The sample codes
 	SampleCode string `json:"sampleCode,required"`
 	// The unit of the organization examination
 	Unit string `json:"unit,required"`
-	// The results belonging to the order
-	Results []OrderResult `json:"results"`
+	// The result if available
+	Result shared.Result `json:"result"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Code           respjson.Field
 		CollectionTime respjson.Field
 		Description    respjson.Field
 		ExaminationID  respjson.Field
+		ItemID         respjson.Field
 		Name           respjson.Field
-		PositionID     respjson.Field
 		SampleCode     respjson.Field
 		Unit           respjson.Field
-		Results        respjson.Field
+		Result         respjson.Field
 		ExtraFields    map[string]respjson.Field
 		raw            string
 	} `json:"-"`
@@ -158,7 +121,7 @@ func (r *OrderExaminationListResponse) UnmarshalJSON(data []byte) error {
 }
 
 type OrderExaminationAddResponse struct {
-	// Reference to Order Position.
+	// Reference to Order Item.
 	ID string `json:"id,required" format:"uuid"`
 	// Custom code for this examination
 	Code string `json:"code,required"`
@@ -169,7 +132,7 @@ type OrderExaminationAddResponse struct {
 	// The name of the organization examination
 	Name string `json:"name,required"`
 	// The results belonging to the order
-	Results []OrderResult `json:"results,required"`
+	Results []shared.Result `json:"results,required"`
 	// The sample codes
 	SampleCode string `json:"sampleCode,required"`
 	// The unit of the organization examination
@@ -220,7 +183,7 @@ type OrderExaminationAddParamsBody struct {
 	ExaminationCode param.Opt[string] `json:"examinationCode,omitzero"`
 	// Reference to Examination ID (you have to use either examinationId or code)
 	ExaminationID param.Opt[string] `json:"examinationId,omitzero" format:"uuid"`
-	// The external unique identifier of the order's position
+	// The external unique identifier of the order's item
 	Reference param.Opt[string] `json:"reference,omitzero"`
 	paramObj
 }
@@ -234,8 +197,8 @@ func (r *OrderExaminationAddParamsBody) UnmarshalJSON(data []byte) error {
 }
 
 type OrderExaminationRemoveParams struct {
-	// List of positions to be removed
-	PostionID []string `query:"postionId,omitzero,required" format:"uuid" json:"-"`
+	// List of items to be removed
+	ItemID []string `query:"itemId,omitzero,required" format:"uuid" json:"-"`
 	paramObj
 }
 
