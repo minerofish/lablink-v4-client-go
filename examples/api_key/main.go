@@ -22,7 +22,7 @@ func testWithAPIKeyClient(baseURL, apiKey string) {
 		option.WithAPIKey(apiKey),
 	)
 
-	response, err := apiKeyClient.Laboratories.Orders.List(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", lablink.LaboratoryOrderListParams{
+	response, err := apiKeyClient.Orders.Query.New(context.TODO(), lablink.OrderQueryNewParams{
 		Page:     lablink.Int(0),
 		PageSize: lablink.Int(200),
 	})

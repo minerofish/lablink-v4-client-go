@@ -1,4 +1,4 @@
-configured_endpoints: 48
-openapi_spec_url: https://storage.googleapis.com/stainless-sdk-openapi-specs/gloster-minerofish%2Flablink-v4-client-848a98773fe2b14b1812e06c990ddd4daf39a3126b0efaa2dcf0c106f39148a3.yml
-openapi_spec_hash: 42b7177160a9ef80929f9944b3c1b648
-config_hash: c44546c97905586cb746560b158acc97
+configured_endpoints: 44
+openapi_spec_url: https://storage.googleapis.com/stainless-sdk-openapi-specs/gloster-minerofish%2Flablink-v4-client-0295c48f8cc30d16a1394a4e20901b5baace922b878da4945bda8e3cc57e6d9d.yml
+openapi_spec_hash: 62bb38c7de2db976d73ef6c6d52692d0
+config_hash: 9c450b24e0e6391a254f8fccd35f1046

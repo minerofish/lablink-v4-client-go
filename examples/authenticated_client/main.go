@@ -60,7 +60,7 @@ func testWithAuthenticatedClient(baseURL, username, password string) {
 
 	// -- Non-paginated list of examinations in an order --
 
-	response2, err := authorizedClient.Do().Laboratories.Orders.List(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", lablink.LaboratoryOrderListParams{
+	response2, err := authorizedClient.Do().Laboratories.QueryContracts(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", lablink.LaboratoryQueryContractsParams{
 		Page:     lablink.Int(0),
 		PageSize: lablink.Int(200),
 	})

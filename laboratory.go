@@ -51,7 +51,8 @@ func NewLaboratoryService(opts ...option.RequestOption) (r LaboratoryService) {
 	return
 }
 
-// Creates new laboratories for the authenticated user.
+// Creates new laboratories for the authenticated user. Laboratories can only be
+// created by genesis or by system users.
 func (r *LaboratoryService) New(ctx context.Context, body LaboratoryNewParams, opts ...option.RequestOption) (res *[]LaboratoryNewResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	path := "v4/laboratories"
@@ -59,16 +60,8 @@ func (r *LaboratoryService) New(ctx context.Context, body LaboratoryNewParams, o
 	return
 }
 
-// Gets a laboratory by its id.
-func (r *LaboratoryService) List(ctx context.Context, query LaboratoryListParams, opts ...option.RequestOption) (res *[]Laboratory, err error) {
-	opts = slices.Concat(r.Options, opts)
-	path := "v4/laboratories"
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
-}
-
-// Deletes a laboratory for the authenticated user. User must have the
-// laboratory_admin role to delete. This operation is audited.
+// Deletes a laboratory for the authenticated user. Only genesis or system users
+// can delete Laboratories.
 func (r *LaboratoryService) Delete(ctx context.Context, body LaboratoryDeleteParams, opts ...option.RequestOption) (err error) {
 	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
@@ -115,70 +108,6 @@ func (r *LaboratoryService) UploadResults(ctx context.Context, laboratoryID stri
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, nil, opts...)
 	return
 }
-
-type Laboratory struct {
-	ID           string                    `json:"id" format:"uuid"`
-	Address      string                    `json:"address"`
-	City         string                    `json:"city"`
-	Country      string                    `json:"country"`
-	CreatedBy    string                    `json:"createdBy"`
-	Email        string                    `json:"email"`
-	InstanceName string                    `json:"instanceName"`
-	Name         string                    `json:"name"`
-	Phone        string                    `json:"phone"`
-	Postcode     string                    `json:"postcode"`
-	UserRoles    []LaboratoryUserRelations `json:"userRoles"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ID           respjson.Field
-		Address      respjson.Field
-		City         respjson.Field
-		Country      respjson.Field
-		CreatedBy    respjson.Field
-		Email        respjson.Field
-		InstanceName respjson.Field
-		Name         respjson.Field
-		Phone        respjson.Field
-		Postcode     respjson.Field
-		UserRoles    respjson.Field
-		ExtraFields  map[string]respjson.Field
-		raw          string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r Laboratory) RawJSON() string { return r.JSON.raw }
-func (r *Laboratory) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type LaboratoryUserRelations struct {
-	Email string `json:"email,required"`
-	// Any of "ORGANIZATION_ADMIN", "USER", "API_USER", "LABORATORY".
-	Role LaboratoryUserRelationsRole `json:"role,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Email       respjson.Field
-		Role        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r LaboratoryUserRelations) RawJSON() string { return r.JSON.raw }
-func (r *LaboratoryUserRelations) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type LaboratoryUserRelationsRole string
-
-const (
-	LaboratoryUserRelationsRoleOrganizationAdmin LaboratoryUserRelationsRole = "ORGANIZATION_ADMIN"
-	LaboratoryUserRelationsRoleUser              LaboratoryUserRelationsRole = "USER"
-	LaboratoryUserRelationsRoleAPIUser           LaboratoryUserRelationsRole = "API_USER"
-	LaboratoryUserRelationsRoleLaboratory        LaboratoryUserRelationsRole = "LABORATORY"
-)
 
 type LaboratoryNewResponse struct {
 	ID string `json:"id" format:"uuid"`
@@ -344,19 +273,6 @@ func (r LaboratoryNewParamsBody) MarshalJSON() (data []byte, err error) {
 }
 func (r *LaboratoryNewParamsBody) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-type LaboratoryListParams struct {
-	LaboratoryID param.Opt[string] `query:"laboratoryId,omitzero" format:"uuid" json:"-"`
-	paramObj
-}
-
-// URLQuery serializes [LaboratoryListParams]'s query parameters as `url.Values`.
-func (r LaboratoryListParams) URLQuery() (v url.Values, err error) {
-	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
-		NestedFormat: apiquery.NestedQueryFormatBrackets,
-	})
 }
 
 type LaboratoryDeleteParams struct {
