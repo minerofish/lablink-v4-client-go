@@ -75,7 +75,7 @@ func TestLaboratoryContractGetWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		lablinkv4client.LaboratoryContractGetParams{
-			Organizationid: lablinkv4client.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			OrganizationID: lablinkv4client.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 			Page:           lablinkv4client.Int(0),
 			PageSize:       lablinkv4client.Int(1),
 			Sort:           []string{"code,asc"},

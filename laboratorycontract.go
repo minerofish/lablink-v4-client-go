@@ -360,7 +360,7 @@ func (r *LaboratoryContractNewParamsBodyExamination) UnmarshalJSON(data []byte) 
 }
 
 type LaboratoryContractGetParams struct {
-	Organizationid param.Opt[string] `query:"organizationid,omitzero" format:"uuid" json:"-"`
+	OrganizationID param.Opt[string] `query:"organizationId,omitzero" format:"uuid" json:"-"`
 	Page           param.Opt[int64]  `query:"Page,omitzero" json:"-"`
 	PageSize       param.Opt[int64]  `query:"PageSize,omitzero" json:"-"`
 	// The sorting parameters in the format of "fieldName,asc/desc". E.g. type,desc

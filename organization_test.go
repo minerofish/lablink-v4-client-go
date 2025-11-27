@@ -68,33 +68,3 @@ func TestOrganizationUpdate(t *testing.T) {
 		t.Fatalf("err should be nil: %s", err.Error())
 	}
 }
-
-func TestOrganizationListWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := lablinkv4client.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
-	)
-	_, err := client.Organizations.List(context.TODO(), lablinkv4client.OrganizationListParams{
-		Email:          []string{"user@example.com"},
-		Name:           lablinkv4client.String("name"),
-		OrganizationID: lablinkv4client.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		Page:           lablinkv4client.Int(0),
-		PageSize:       lablinkv4client.Int(1),
-		Roles:          []lablinkv4client.OrganizationRole{lablinkv4client.OrganizationRoleOrganizationAdmin},
-	})
-	if err != nil {
-		var apierr *lablinkv4client.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}

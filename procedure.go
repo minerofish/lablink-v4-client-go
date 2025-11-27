@@ -59,9 +59,8 @@ func (r *ProcedureService) Update(ctx context.Context, procedureID string, body 
 	return
 }
 
-// Procedures can be single or multiple laboratory-tests performed in a certain
-// manner. Procecdures can be seen as a global catalog of all valid examination
-// procedures offered by laboratories.
+// Procedures are laboratory-tests or test procedures. Procedures can be seen as a
+// global catalog of all valid examination procedures offered by laboratories.
 func (r *ProcedureService) List(ctx context.Context, query ProcedureListParams, opts ...option.RequestOption) (res *[]ProcedureResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	path := "v4/procedures"
