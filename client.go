@@ -27,6 +27,7 @@ type Client struct {
 	Token         TokenService
 	Orders        OrderService
 	Organizations OrganizationService
+	Admin         AdminService
 }
 
 // DefaultClientOptions read from the environment (LABLINK_V4_CLIENT_API_KEY,
@@ -61,6 +62,7 @@ func NewClient(opts ...option.RequestOption) (r Client) {
 	r.Token = NewTokenService(opts...)
 	r.Orders = NewOrderService(opts...)
 	r.Organizations = NewOrganizationService(opts...)
+	r.Admin = NewAdminService(opts...)
 
 	return
 }

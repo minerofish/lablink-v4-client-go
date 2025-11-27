@@ -13,7 +13,7 @@ import (
 	"github.com/minerofish/lablink-v4-client-go/option"
 )
 
-func TestOrganizationQueryNewWithOptionalParams(t *testing.T) {
+func TestAdminInviteUserWithOptionalParams(t *testing.T) {
 	t.Skip("Prism tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -26,14 +26,11 @@ func TestOrganizationQueryNewWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithBearerToken("My Bearer Token"),
 	)
-	_, err := client.Organizations.Query.New(context.TODO(), lablinkv4client.OrganizationQueryNewParams{
-		Page:            lablinkv4client.Int(0),
-		PageSize:        lablinkv4client.Int(1),
-		Sort:            []string{"name,asc"},
-		Emails:          []string{"user@example.com"},
-		Name:            lablinkv4client.String("John Doe Clinic"),
-		OrganizationIDs: []string{"123e4567-e89b-12d3-a456-426614174000"},
-		Roles:           []string{"ORGANIZATION_ADMIN"},
+	err := client.Admin.InviteUser(context.TODO(), lablinkv4client.AdminInviteUserParams{
+		Email:             "dev@stainless.com",
+		ForOrganizationID: "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		Role:              lablinkv4client.AdminInviteUserParamsRoleOrganizationAdmin,
+		ForLocations:      []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
 	})
 	if err != nil {
 		var apierr *lablinkv4client.Error

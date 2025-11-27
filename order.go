@@ -56,18 +56,6 @@ func (r *OrderService) New(ctx context.Context, params OrderNewParams, opts ...o
 	return
 }
 
-// Gets an order.
-func (r *OrderService) Get(ctx context.Context, orderID string, opts ...option.RequestOption) (res *OrderGetResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
-	if orderID == "" {
-		err = errors.New("missing required orderId parameter")
-		return
-	}
-	path := fmt.Sprintf("v4/orders/%s", orderID)
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
-}
-
 // Deletes all order with the provided ids.
 func (r *OrderService) Delete(ctx context.Context, body OrderDeleteParams, opts ...option.RequestOption) (err error) {
 	opts = slices.Concat(r.Options, opts)
@@ -302,6 +290,8 @@ type OrderExamination struct {
 	ItemID string `json:"itemId,required" format:"uuid"`
 	// The sample codes
 	SampleCode string `json:"sampleCode,required"`
+	// Reference to procedure.
+	ProcedureID string `json:"procedureId" format:"uuid"`
 	// The external unique identifier of the order
 	Reference string `json:"reference"`
 	// The result belonging to the order
@@ -313,6 +303,7 @@ type OrderExamination struct {
 		ExaminationID   respjson.Field
 		ItemID          respjson.Field
 		SampleCode      respjson.Field
+		ProcedureID     respjson.Field
 		Reference       respjson.Field
 		Result          respjson.Field
 		ExtraFields     map[string]respjson.Field
@@ -524,64 +515,6 @@ const (
 	Rhesus2   Rhesus = "2"
 )
 
-type OrderGetResponse struct {
-	// The ID of the order
-	ID string `json:"id,required" format:"uuid"`
-	// The examinations belonging to the order
-	Examinations []OrderExamination `json:"examinations,required"`
-	// The laboratory ID where the order will be sent
-	LaboratoryID string `json:"laboratoryId,required" format:"uuid"`
-	// Identifier of the location (client)
-	LocationID string `json:"locationId,required" format:"uuid"`
-	// The order creation date-time (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
-	OrderCreationDateTime time.Time `json:"orderCreationDateTime,required" format:"date-time"`
-	// The order status model
-	//
-	// Any of "ENTERED", "WAITING_FOR_MATERIAL", "PROCESSING", "CONFIRMATION_PENDING",
-	// "FINAL", "DELETED", "ERROR".
-	State OrderStateType `json:"state,required"`
-	// The order type
-	//
-	// Any of "DONOR", "BONE_MARROW_DONOR", "PERSONAL", "PSEUDONYM".
-	Type OrderType `json:"type,required"`
-	// The blood donor data when type is DONOR
-	BloodDonor BloodDonor `json:"bloodDonor"`
-	// The bone-marrow donor data when type is BONE_MARROW_DONOR
-	BoneMarrowDonor BoneMarrowDonor `json:"boneMarrowDonor"`
-	// The tags belonging to the order
-	OrderTags []string `json:"orderTags"`
-	// The patient data when type is PERSONAL
-	Patient Patient `json:"patient"`
-	// The pseudonym data when type is PSEUDONYM
-	Pseudonym Pseudonym `json:"pseudonym"`
-	// Add information in key:value pairs object array that are stored with the order
-	References map[string]string `json:"references"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ID                    respjson.Field
-		Examinations          respjson.Field
-		LaboratoryID          respjson.Field
-		LocationID            respjson.Field
-		OrderCreationDateTime respjson.Field
-		State                 respjson.Field
-		Type                  respjson.Field
-		BloodDonor            respjson.Field
-		BoneMarrowDonor       respjson.Field
-		OrderTags             respjson.Field
-		Patient               respjson.Field
-		Pseudonym             respjson.Field
-		References            respjson.Field
-		ExtraFields           map[string]respjson.Field
-		raw                   string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r OrderGetResponse) RawJSON() string { return r.JSON.raw }
-func (r *OrderGetResponse) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
 type OrderNewParams struct {
 	// Fail entire batch on error
 	FailOnError param.Opt[bool] `query:"failOnError,omitzero" json:"-"`
@@ -608,8 +541,10 @@ func (r OrderNewParams) URLQuery() (v url.Values, err error) {
 	})
 }
 
-// The properties LaboratoryID, LocationID, Type are required.
+// The properties Items, LaboratoryID, LocationID, Type are required.
 type OrderNewParamsBody struct {
+	// The items belonging to the order
+	Items []OrderNewParamsBodyItem `json:"items,omitzero,required"`
 	// The laboratory ID where the order will be sent
 	LaboratoryID string `json:"laboratoryId,required" format:"uuid"`
 	// Identifier of the location (client)
@@ -622,8 +557,6 @@ type OrderNewParamsBody struct {
 	BloodDonor BloodDonorParam `json:"bloodDonor,omitzero"`
 	// The bone-marrow donor data when type is BONE_MARROW_DONOR
 	BoneMarrowDonor BoneMarrowDonorParam `json:"boneMarrowDonor,omitzero"`
-	// The items belonging to the order
-	Items []OrderNewParamsBodyItem `json:"items,omitzero"`
 	// The patient data when type is PERSONAL
 	Patient PatientParam `json:"patient,omitzero"`
 	// The pseudonym data when type is PSEUDONYM

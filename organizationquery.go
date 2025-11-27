@@ -99,17 +99,18 @@ func (r *OrganizationQueryNewResponseItem) UnmarshalJSON(data []byte) error {
 }
 
 type OrganizationQueryNewResponseItemContractLaboratory struct {
-	ID           string                    `json:"id" format:"uuid"`
-	Address      string                    `json:"address"`
-	City         string                    `json:"city"`
-	Country      string                    `json:"country"`
-	CreatedBy    string                    `json:"createdBy"`
-	Email        string                    `json:"email"`
-	InstanceName string                    `json:"instanceName"`
-	Name         string                    `json:"name"`
-	Phone        string                    `json:"phone"`
-	Postcode     string                    `json:"postcode"`
-	UserRoles    []LaboratoryUserRelations `json:"userRoles"`
+	ID           string `json:"id" format:"uuid"`
+	Address      string `json:"address"`
+	City         string `json:"city"`
+	Country      string `json:"country"`
+	CreatedBy    string `json:"createdBy"`
+	Email        string `json:"email"`
+	InstanceName string `json:"instanceName"`
+	Name         string `json:"name"`
+	Phone        string `json:"phone"`
+	Postcode     string `json:"postcode"`
+	// Any of "LABORATORY_ADMIN".
+	UserRoles map[string]string `json:"userRoles"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID           respjson.Field
@@ -146,8 +147,9 @@ type OrganizationQueryNewParams struct {
 	Sort   []string `query:"sort,omitzero" json:"-"`
 	Emails []string `json:"emails,omitzero" format:"email"`
 	// Filter by order IDs
-	OrganizationIDs []string           `json:"organizationIDs,omitzero" format:"uuid"`
-	Roles           []OrganizationRole `json:"roles,omitzero"`
+	OrganizationIDs []string `json:"organizationIDs,omitzero" format:"uuid"`
+	// Any of "ORGANIZATION_ADMIN", "ORGANIZATION_USER".
+	Roles []string `json:"roles,omitzero"`
 	paramObj
 }
 

@@ -8,11 +8,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"net/url"
 	"slices"
 
 	"github.com/minerofish/lablink-v4-client-go/internal/apijson"
-	"github.com/minerofish/lablink-v4-client-go/internal/apiquery"
 	shimjson "github.com/minerofish/lablink-v4-client-go/internal/encoding/json"
 	"github.com/minerofish/lablink-v4-client-go/internal/requestconfig"
 	"github.com/minerofish/lablink-v4-client-go/option"
@@ -61,14 +59,6 @@ func (r *OrganizationService) Update(ctx context.Context, organizationID string,
 	return
 }
 
-// Retrieves all organizations.
-func (r *OrganizationService) List(ctx context.Context, query OrganizationListParams, opts ...option.RequestOption) (res *[]Organization, err error) {
-	opts = slices.Concat(r.Options, opts)
-	path := "v4/organizations"
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
-}
-
 type Organization struct {
 	ID                   string                           `json:"id,required" format:"uuid"`
 	Name                 string                           `json:"name,required"`
@@ -94,17 +84,18 @@ func (r *Organization) UnmarshalJSON(data []byte) error {
 }
 
 type OrganizationContractLaboratory struct {
-	ID           string                    `json:"id" format:"uuid"`
-	Address      string                    `json:"address"`
-	City         string                    `json:"city"`
-	Country      string                    `json:"country"`
-	CreatedBy    string                    `json:"createdBy"`
-	Email        string                    `json:"email"`
-	InstanceName string                    `json:"instanceName"`
-	Name         string                    `json:"name"`
-	Phone        string                    `json:"phone"`
-	Postcode     string                    `json:"postcode"`
-	UserRoles    []LaboratoryUserRelations `json:"userRoles"`
+	ID           string `json:"id" format:"uuid"`
+	Address      string `json:"address"`
+	City         string `json:"city"`
+	Country      string `json:"country"`
+	CreatedBy    string `json:"createdBy"`
+	Email        string `json:"email"`
+	InstanceName string `json:"instanceName"`
+	Name         string `json:"name"`
+	Phone        string `json:"phone"`
+	Postcode     string `json:"postcode"`
+	// Any of "LABORATORY_ADMIN".
+	UserRoles map[string]string `json:"userRoles"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID           respjson.Field
@@ -128,14 +119,6 @@ func (r OrganizationContractLaboratory) RawJSON() string { return r.JSON.raw }
 func (r *OrganizationContractLaboratory) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
-
-type OrganizationRole string
-
-const (
-	OrganizationRoleOrganizationAdmin OrganizationRole = "ORGANIZATION_ADMIN"
-	OrganizationRoleUser              OrganizationRole = "USER"
-	OrganizationRoleAPIUser           OrganizationRole = "API_USER"
-)
 
 type OrganizationNewParams struct {
 	Body []OrganizationNewParamsBody
@@ -175,28 +158,4 @@ func (r OrganizationUpdateParams) MarshalJSON() (data []byte, err error) {
 }
 func (r *OrganizationUpdateParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-type OrganizationListParams struct {
-	// Filter by name. Thhis supports partial matches.
-	Name param.Opt[string] `query:"name,omitzero" json:"-"`
-	// Filter by organization IDs. If omitted all organizations are returned.
-	OrganizationID param.Opt[string] `query:"organizationID,omitzero" format:"uuid" json:"-"`
-	// Page number, starts at 0.
-	Page param.Opt[int64] `query:"page,omitzero" json:"-"`
-	// Number of items per page. Maximum is 200.
-	PageSize param.Opt[int64] `query:"pageSize,omitzero" json:"-"`
-	// Filter by email addresses associated with the organizations.
-	Email []string `query:"email,omitzero" format:"email" json:"-"`
-	// Filter by organization roles.
-	Roles []OrganizationRole `query:"roles,omitzero" json:"-"`
-	paramObj
-}
-
-// URLQuery serializes [OrganizationListParams]'s query parameters as `url.Values`.
-func (r OrganizationListParams) URLQuery() (v url.Values, err error) {
-	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
-		NestedFormat: apiquery.NestedQueryFormatBrackets,
-	})
 }

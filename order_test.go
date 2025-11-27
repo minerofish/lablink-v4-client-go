@@ -36,6 +36,13 @@ func TestOrderNewWithOptionalParams(t *testing.T) {
 		LaboratoryID: lablinkv4client.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		LocationID:   lablinkv4client.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		Body: []lablinkv4client.OrderNewParamsBody{{
+			Items: []lablinkv4client.OrderNewParamsBodyItem{{
+				CollectionTime:  time.Now(),
+				SampleCode:      "sampleCode",
+				ExaminationCode: lablinkv4client.String("examinationCode"),
+				ExaminationID:   lablinkv4client.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+				Reference:       lablinkv4client.String("reference"),
+			}},
 			LaboratoryID: "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 			LocationID:   "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 			Type:         lablinkv4client.OrderTypeDonor,
@@ -53,13 +60,6 @@ func TestOrderNewWithOptionalParams(t *testing.T) {
 			BoneMarrowDonor: lablinkv4client.BoneMarrowDonorParam{
 				DonorCode: "donorCode",
 			},
-			Items: []lablinkv4client.OrderNewParamsBodyItem{{
-				CollectionTime:  time.Now(),
-				SampleCode:      "sampleCode",
-				ExaminationCode: lablinkv4client.String("examinationCode"),
-				ExaminationID:   lablinkv4client.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-				Reference:       lablinkv4client.String("reference"),
-			}},
 			Patient: lablinkv4client.PatientParam{
 				DateOfBirth:          time.Now(),
 				FirstName:            "firstName",
@@ -83,29 +83,6 @@ func TestOrderNewWithOptionalParams(t *testing.T) {
 			Tags: []string{"-_-k  W2K-1V"},
 		}},
 	})
-	if err != nil {
-		var apierr *lablinkv4client.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
-func TestOrderGet(t *testing.T) {
-	t.Skip("Prism tests are disabled")
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := lablinkv4client.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
-	)
-	_, err := client.Orders.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *lablinkv4client.Error
 		if errors.As(err, &apierr) {

@@ -35,7 +35,8 @@ func NewLaboratoryQueryService(opts ...option.RequestOption) (r LaboratoryQueryS
 	return
 }
 
-// Queries laboratories. The caller must be user for the respective laboratories.
+// Queries laboratories. The Laboratory catalog is accessible for all users of
+// lablink.
 func (r *LaboratoryQueryService) Execute(ctx context.Context, params LaboratoryQueryExecuteParams, opts ...option.RequestOption) (res *LaboratoryQueryExecuteResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	path := "v4/laboratories-query"
@@ -75,17 +76,18 @@ func (r *LaboratoryQueryExecuteResponse) UnmarshalJSON(data []byte) error {
 }
 
 type LaboratoryQueryExecuteResponseItem struct {
-	ID           string                    `json:"id" format:"uuid"`
-	Address      string                    `json:"address"`
-	City         string                    `json:"city"`
-	Country      string                    `json:"country"`
-	CreatedBy    string                    `json:"createdBy"`
-	Email        string                    `json:"email"`
-	InstanceName string                    `json:"instanceName"`
-	Name         string                    `json:"name"`
-	Phone        string                    `json:"phone"`
-	Postcode     string                    `json:"postcode"`
-	UserRoles    []LaboratoryUserRelations `json:"userRoles"`
+	ID           string `json:"id" format:"uuid"`
+	Address      string `json:"address"`
+	City         string `json:"city"`
+	Country      string `json:"country"`
+	CreatedBy    string `json:"createdBy"`
+	Email        string `json:"email"`
+	InstanceName string `json:"instanceName"`
+	Name         string `json:"name"`
+	Phone        string `json:"phone"`
+	Postcode     string `json:"postcode"`
+	// Any of "LABORATORY_ADMIN".
+	UserRoles map[string]string `json:"userRoles"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID           respjson.Field
