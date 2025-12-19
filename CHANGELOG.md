@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.5.0 (2025-12-19)
+
+Full Changelog: [v0.4.0...v0.5.0](https://github.com/minerofish/lablink-v4-client-go/compare/v0.4.0...v0.5.0)
+
+### Features
+
+* **encoder:** support bracket encoding form-data object members ([1ee5602](https://github.com/minerofish/lablink-v4-client-go/commit/1ee5602f1f92ed0be683fec47f2667b141b5938b))
+
+
+### Bug Fixes
+
+* **mcp:** correct code tool API endpoint ([0eaf4c5](https://github.com/minerofish/lablink-v4-client-go/commit/0eaf4c5c4687581f446f5621d9bc57d62d966a8f))
+* rename param to avoid collision ([dfe1b2f](https://github.com/minerofish/lablink-v4-client-go/commit/dfe1b2f8cfd20acbd9991b97a5b9906e2140f37c))
+* skip usage tests that don't work with Prism ([27ff9d2](https://github.com/minerofish/lablink-v4-client-go/commit/27ff9d2a36d4998235ab436d27253290df6b3ea6))
+
+
+### Chores
+
+* add float64 to valid types for RegisterFieldValidator ([248f29e](https://github.com/minerofish/lablink-v4-client-go/commit/248f29e61d7486f134ed4ae046718c1aa039fa0e))
+* elide duplicate aliases ([2b55d1a](https://github.com/minerofish/lablink-v4-client-go/commit/2b55d1a16e7ec1869fc9f3b9f69c6cedc7017e51))
+* **internal:** codegen related update ([8ddbc6b](https://github.com/minerofish/lablink-v4-client-go/commit/8ddbc6be9c62cdf577ea86753309224d34b74d77))
+
 ## 0.4.0 (2025-11-27)
 
 Full Changelog: [v0.3.0...v0.4.0](https://github.com/minerofish/lablink-v4-client-go/compare/v0.3.0...v0.4.0)

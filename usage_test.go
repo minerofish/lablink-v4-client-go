@@ -24,6 +24,7 @@ func TestUsage(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithBearerToken("My Bearer Token"),
 	)
+	t.Skip("Prism tests are disabled")
 	bloodlabOrganizationRelations, err := client.Bloodlab.ListExaminations(context.TODO())
 	if err != nil {
 		t.Fatalf("err should be nil: %s", err.Error())
